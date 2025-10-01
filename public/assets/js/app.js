@@ -147,7 +147,7 @@
   }
 
   // current url [Eg: dashboard.html]
-  const current = location.pathname.split("../../../index.html").slice(-1)[0].replace(/^\/|\/$/g, '');
+  const current = location.pathname.replace(/^\/|\/$/g, '');
 
   if (sidebar) {
     const sidebarNavLinks = document.querySelectorAll('.sidebar .nav li a');
@@ -295,33 +295,33 @@
 
 
   // Buy Now & Doc buttons [only for server] 
-  const buyNowWrapper  = document.createElement('div'),
-        docLink        = document.createElement('a'),
-        docLinkIcon    = document.createElement('i'),
-        buyNowLink     = document.createElement('a'),
-        buyNowLinkIcon = document.createElement('i'),
-        docLinkHref    = '../../documentation/docs.html',
-        buyNowLinkHref = 'https://1.envato.market/nobleui_html';
+  // const buyNowWrapper  = document.createElement('div'),
+  //       docLink        = document.createElement('a'),
+  //       docLinkIcon    = document.createElement('i'),
+  //       buyNowLink     = document.createElement('a'),
+  //       buyNowLinkIcon = document.createElement('i'),
+  //       docLinkHref    = '../../documentation/docs.html',
+  //       buyNowLinkHref = 'https://1.envato.market/nobleui_html';
 
-  buyNowWrapper.classList.add('buy-now-wrapper');
+  // buyNowWrapper.classList.add('buy-now-wrapper');
   
-  docLink.classList.add('btn', 'btn-primary');
-  docLink.setAttribute('href', docLinkHref);
-  docLink.setAttribute('target', '_blank');
-  docLinkIcon.classList.add('icon-lg');
-  docLinkIcon.setAttribute('data-lucide', 'file-text');
+  // docLink.classList.add('btn', 'btn-primary');
+  // docLink.setAttribute('href', docLinkHref);
+  // docLink.setAttribute('target', '_blank');
+  // docLinkIcon.classList.add('icon-lg');
+  // docLinkIcon.setAttribute('data-lucide', 'file-text');
 
-  buyNowLink.classList.add('btn', 'btn-danger', 'ms-2');
-  buyNowLink.innerText = 'Buy Now';
-  buyNowLink.setAttribute('href', buyNowLinkHref);
-  buyNowLink.setAttribute('target', '_blank');
-  buyNowLinkIcon.classList.add('icon-lg', 'me-1');
-  buyNowLinkIcon.setAttribute('data-lucide', 'shopping-cart');
+  // buyNowLink.classList.add('btn', 'btn-danger', 'ms-2');
+  // buyNowLink.innerText = 'Buy Now';
+  // buyNowLink.setAttribute('href', buyNowLinkHref);
+  // buyNowLink.setAttribute('target', '_blank');
+  // buyNowLinkIcon.classList.add('icon-lg', 'me-1');
+  // buyNowLinkIcon.setAttribute('data-lucide', 'shopping-cart');
 
-  docLink.append(docLinkIcon);
-  buyNowLink.prepend(buyNowLinkIcon);
-  buyNowWrapper.append(docLink, buyNowLink);
-  body.append(buyNowWrapper);
+  // docLink.append(docLinkIcon);
+  // buyNowLink.prepend(buyNowLinkIcon);
+  // buyNowWrapper.append(docLink, buyNowLink);
+  // body.append(buyNowWrapper);
 
 
 

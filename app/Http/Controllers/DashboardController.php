@@ -11,7 +11,16 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('dashboard');
+        $data = [
+            'title' => 'Dashboard',
+            'breadcrumbs' => [
+                ['text' => 'Main'],
+                ['text' => 'Dashboard','url' => route('dashboard.index')],
+            ]
+        ];
+
+
+        return view('dashboard', $data);
     }
 
     /**
@@ -60,5 +69,19 @@ class DashboardController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function settings()
+    {
+        $data = [
+            'title' => 'Dashboard',
+            'breadcrumbs' => [
+                ['text' => 'Home', 'url' => route('dashboard.index')],
+                ['text' => 'Dashboard'],
+            ]
+        ];
+
+
+        return view('settings', $data);
     }
 }

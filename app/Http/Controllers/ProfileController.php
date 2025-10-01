@@ -16,9 +16,16 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
+        $data = [
+            'title' => 'Profile',
+            'breadcrumbs' => [
+                ['text' => 'Home', 'url' => route('dashboard.index')],
+                ['text' => 'Profile'],
+            ],
             'user' => $request->user(),
-        ]);
+        ];
+
+        return view('profile.edit', $data);
     }
 
     /**
