@@ -35,6 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('jabatan/{id}/force-delete', [\App\Http\Controllers\JabatanController::class, 'forceDelete'])->name('jabatan.forceDelete');
     Route::resource('jabatan', \App\Http\Controllers\JabatanController::class)->except(['show']);
 
+    // Master Induk Unit Kerja
+    Route::get('induk_unit_kerja/trash', [\App\Http\Controllers\IndukUnitKerjaController::class, 'trash'])->name('induk_unit_kerja.trash');
+    Route::get('induk_unit_kerja/{id}/restore', [\App\Http\Controllers\IndukUnitKerjaController::class, 'restore'])->name('induk_unit_kerja.restore');
+    Route::delete('induk_unit_kerja/{id}/force-delete', [\App\Http\Controllers\IndukUnitKerjaController::class, 'forceDelete'])->name('induk_unit_kerja.forceDelete');
+    Route::resource('induk_unit_kerja', \App\Http\Controllers\IndukUnitKerjaController::class)->except(['show']);
+
     Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

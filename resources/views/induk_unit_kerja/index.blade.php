@@ -13,12 +13,12 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Daftar Data Jabatan</h4>
-                <p class="text-muted mb-3">Berikut adalah daftar semua data jabatan yang terdaftar.</p>
+                <h4 class="card-title">Daftar Data Induk Unit Kerja</h4>
+                <p class="text-muted mb-3">Berikut adalah daftar semua data induk unit kerja yang terdaftar.</p>
                 <div class="text-end mb-3">
-    <a href="{{ route('jabatan.create') }}" class="btn btn-primary">Tambah Jabatan</a>
-    <a href="{{ route('jabatan.trash') }}" class="btn btn-danger">Recycle Bin</a>
-</div>
+                    <a href="{{ route('induk_unit_kerja.create') }}" class="btn btn-primary">Tambah Induk Unit Kerja</a>
+                    <a href="{{ route('induk_unit_kerja.trash') }}" class="btn btn-danger">Recycle Bin</a>
+                </div>
                 
                 <div class="table dataTable">
                     {{ $dataTable->table() }}
