@@ -96,19 +96,19 @@
                             </tr>
                             <tr>
                                 <th>Provinsi</th>
-                                <td>{{ $resolvedProvinsi ?? '-' }}</td>
+                                <td>{{ $pegawai->provinsi ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <th>Kabupaten</th>
-                                <td>{{ $resolvedKabupaten ?? '-' }}</td>
+                                <td>{{ $pegawai->kabupaten ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <th>Kecamatan</th>
-                                <td>{{ $resolvedKecamatan ?? '-' }}</td>
+                                <td>{{ $pegawai->kecamatan ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <th>Kelurahan</th>
-                                <td>{{ $resolvedKelurahan ?? '-' }}</td>
+                                <td>{{ $pegawai->kelurahan ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <th>Kebangsaan</th>
@@ -184,6 +184,7 @@
                 
                 <div class="mt-4">
                     <a href="{{ route('pegawai.edit', $pegawai->id) }}" class="btn btn-warning me-2">Edit Data</a>
+                    <a href="{{ route('pegawai.pdf', $pegawai->id) }}" class="btn btn-success me-2">Export to PDF</a>
                     <a href="{{ route('pegawai.index') }}" class="btn btn-secondary">Kembali</a>
                 </div>
                 

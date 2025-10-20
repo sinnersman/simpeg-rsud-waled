@@ -63,10 +63,13 @@
                     <div class="collapse" data-bs-parent="#sidebarNav" id="Master">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
-                                <a href="pages/advanced-ui/cropper.html" class="nav-link">Data Jabatan</a>
+                                <a href="{{ route('jabatan.index') }}" class="nav-link">Data Jabatan</a>
                             </li>
                             <li class="nav-item">
                                 <a href="pages/advanced-ui/owl-carousel.html" class="nav-link">Data Unit Kerja</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="pages/advanced-ui/owl-carousel.html" class="nav-link">Data Induk Unit Kerja</a>
                             </li>
                         </ul>
                     </div>

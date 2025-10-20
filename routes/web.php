@@ -27,6 +27,14 @@ Route::get('/villages', [DependentDropdownController::class, 'villages'])->name(
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
     Route::resource('pegawai', PegawaiController::class);
+    Route::get('/pegawai/{id}/pdf', [PegawaiController::class, 'generatePDF'])->name('pegawai.pdf');
+
+    // Master Jabatan
+    Route::get('jabatan/trash', [\App\Http\Controllers\JabatanController::class, 'trash'])->name('jabatan.trash');
+    Route::get('jabatan/{id}/restore', [\App\Http\Controllers\JabatanController::class, 'restore'])->name('jabatan.restore');
+    Route::delete('jabatan/{id}/force-delete', [\App\Http\Controllers\JabatanController::class, 'forceDelete'])->name('jabatan.forceDelete');
+    Route::resource('jabatan', \App\Http\Controllers\JabatanController::class)->except(['show']);
+
     Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

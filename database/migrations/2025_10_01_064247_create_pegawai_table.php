@@ -59,6 +59,7 @@ return new class extends Migration
             $table->string('no_npwp')->nullable();
             $table->string('no_korpri')->nullable();
 
+            $table->softDeletes();
             $table->timestamps();
         });
     }

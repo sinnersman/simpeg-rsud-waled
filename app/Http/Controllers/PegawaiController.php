@@ -7,6 +7,7 @@ use App\Models\Pegawai;
 use Illuminate\Support\Facades\Storage;
 use App\DataTables\PegawaiDataTable;
 use Indonesia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PegawaiController extends Controller
 {
@@ -120,13 +121,7 @@ class PegawaiController extends Controller
             ['name' => 'Detail Pegawai', 'active' => true]
         ];
 
-        // Resolve region names directly from IDs stored in the database
-        $resolvedProvinsi = $pegawai->provinsi ? Indonesia::findProvince($pegawai->provinsi)->name : '-';
-        $resolvedKabupaten = $pegawai->kabupaten ? Indonesia::findCity($pegawai->kabupaten)->name : '-';
-        $resolvedKecamatan = $pegawai->kecamatan ? Indonesia::findDistrict($pegawai->kecamatan)->name : '-';
-        $resolvedKelurahan = $pegawai->kelurahan ? Indonesia::findVillage($pegawai->kelurahan)->name : '-';
-
-        return view('pegawai.show', compact('pegawai', 'title', 'breadcrumbs', 'resolvedProvinsi', 'resolvedKabupaten', 'resolvedKecamatan', 'resolvedKelurahan'));
+        return view('pegawai.show', compact('pegawai', 'title', 'breadcrumbs'));
     }
 
     /**
@@ -234,5 +229,12 @@ class PegawaiController extends Controller
         $pegawai->delete();
 
         return redirect()->route('pegawai.index')->with('success', 'Data Pegawai berhasil dihapus!');
+    }
+
+    public function generatePDF(string $id)
+    {
+        $pegawai = Pegawai::findOrFail($id);
+        $pdf = Pdf::loadView('pegawai.pdf', compact('pegawai'));
+        return $pdf->download('pegawai-' . $pegawai->nip . '.pdf');
     }
 }
