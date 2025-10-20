@@ -66,7 +66,7 @@
                                 <a href="{{ route('jabatan.index') }}" class="nav-link">Data Jabatan</a>
                             </li>
                             <li class="nav-item">
-                                <a href="pages/advanced-ui/owl-carousel.html" class="nav-link">Data Unit Kerja</a>
+                                <a href="{{ route('unit_kerja.index') }}" class="nav-link">Data Unit Kerja</a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('induk_unit_kerja.index') }}" class="nav-link">Data Induk Unit Kerja</a>

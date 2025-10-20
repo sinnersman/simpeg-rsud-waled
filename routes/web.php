@@ -41,6 +41,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('induk_unit_kerja/{id}/force-delete', [\App\Http\Controllers\IndukUnitKerjaController::class, 'forceDelete'])->name('induk_unit_kerja.forceDelete');
     Route::resource('induk_unit_kerja', \App\Http\Controllers\IndukUnitKerjaController::class)->except(['show']);
 
+    // Master Unit Kerja
+    Route::get('unit_kerja/trash', [\App\Http\Controllers\UnitKerjaController::class, 'trash'])->name('unit_kerja.trash');
+    Route::get('unit_kerja/{id}/restore', [\App\Http\Controllers\UnitKerjaController::class, 'restore'])->name('unit_kerja.restore');
+    Route::delete('unit_kerja/{id}/force-delete', [\App\Http\Controllers\UnitKerjaController::class, 'forceDelete'])->name('unit_kerja.forceDelete');
+    Route::resource('unit_kerja', \App\Http\Controllers\UnitKerjaController::class)->except(['show']);
+
     Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
