@@ -14,8 +14,8 @@ class DashboardController extends Controller
         $data = [
             'title' => 'Dashboard',
             'breadcrumbs' => [
-                ['text' => 'Main'],
-                ['text' => 'Dashboard','url' => route('dashboard.index')],
+                ['name' => 'Main'],
+                ['name' => 'Dashboard','url' => route('dashboard.index')],
             ]
         ];
 
@@ -76,8 +76,8 @@ class DashboardController extends Controller
         $data = [
             'title' => 'Dashboard',
             'breadcrumbs' => [
-                ['text' => 'Home', 'url' => route('dashboard.index')],
-                ['text' => 'Dashboard'],
+                ['name' => 'Home', 'url' => route('dashboard.index')],
+                ['name' => 'Dashboard'],
             ]
         ];
 

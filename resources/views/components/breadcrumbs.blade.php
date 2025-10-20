@@ -6,9 +6,9 @@
             <li class="breadcrumb-item{{ isset($breadcrumb['url']) ? '' : ' active' }}"
                 @if (!isset($breadcrumb['url'])) aria-current="page" @endif>
                 @if (isset($breadcrumb['url']))
-                    <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['text'] }}</a>
+                    <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['name'] }}</a>
                 @else
-                    {{ $breadcrumb['text'] }}
+                    {{ $breadcrumb['name'] }}
                 @endif
             </li>
         @endforeach

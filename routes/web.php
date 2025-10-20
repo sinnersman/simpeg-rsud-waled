@@ -1,7 +1,13 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PegawaiController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DependentDropdownController;
+
+/*
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     // return view('welcome');
     // redirect()->route('login');
@@ -13,8 +19,14 @@ Route::get('/', function () {
 });
 
 
-Route::middleware('auth')->group(function () {
+Route::get('/provinces', [DependentDropdownController::class, 'provinces'])->name('provinces');
+Route::get('/cities', [DependentDropdownController::class, 'cities'])->name('cities');
+Route::get('/districts', [DependentDropdownController::class, 'districts'])->name('districts');
+Route::get('/villages', [DependentDropdownController::class, 'villages'])->name('villages');
+
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
+    Route::resource('pegawai', PegawaiController::class);
     Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

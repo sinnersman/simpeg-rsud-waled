@@ -19,6 +19,23 @@
                         <span class="link-title">Dashboard</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#ePersonal" role="button" aria-expanded="false" aria-controls="ePersonal">
+                        <i class="link-icon" data-lucide="users"></i>
+                        <span class="link-title">E-Personal</span>
+                        <i class="link-arrow" data-lucide="chevron-down"></i>
+                    </a>
+                    <div class="collapse" data-bs-parent="#sidebarNav" id="ePersonal">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('pegawai.index') }}" class="nav-link">Data Pegawai</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="pages/advanced-ui/owl-carousel.html" class="nav-link">Dokumen Karyawan</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
                 <li class="nav-item nav-category">Pengaturan</li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#manajemenAkun" role="button" aria-expanded="false" aria-controls="manajemenAkun">
