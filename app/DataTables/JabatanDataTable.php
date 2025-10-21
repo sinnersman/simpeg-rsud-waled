@@ -46,7 +46,8 @@ class JabatanDataTable extends DataTable
             ->columns($this->getColumns())
             ->ajax(route('jabatan.index'))
             ->orderBy(1)
-            ->selectStyleSingle();
+            ->selectStyleSingle()
+            ->responsive(false);
     }
 
     /**

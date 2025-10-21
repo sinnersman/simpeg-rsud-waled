@@ -77,7 +77,6 @@ class PegawaiDataTable extends DataTable
             ->dom('<"row mb-3"<"col-md-6"B><"col-md-6 text-end"l<"mt-2"f>>>rtip') // Custom DOM for layout
             ->orderBy(1)
             ->selectStyleSingle()
-            ->responsive(true)
             ->buttons([
                 [
                     'text' => 'Tambah Pegawai',

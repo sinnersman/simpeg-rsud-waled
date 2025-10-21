@@ -15,8 +15,10 @@
                 <h4 class="card-title">Daftar Data Pegawai</h4>
                 <p class="text-muted mb-3">Berikut adalah daftar semua data pegawai yang terdaftar.</p>
                 
-                <div class="table dataTable">
-                    {{ $dataTable->table() }}
+                <div class="table-responsive">
+                    <div class="table dataTable">
+                        {{ $dataTable->table() }}
+                    </div>
                 </div>
             </div>
         </div>

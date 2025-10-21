@@ -46,7 +46,8 @@ class IndukUnitKerjaDataTable extends DataTable
             ->columns($this->getColumns())
             ->ajax(route('induk_unit_kerja.index'))
             ->orderBy(1)
-            ->selectStyleSingle();
+            ->selectStyleSingle()
+            ->responsive(false);
     }
 
     /**

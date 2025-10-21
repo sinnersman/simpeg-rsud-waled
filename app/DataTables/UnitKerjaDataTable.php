@@ -49,7 +49,8 @@ class UnitKerjaDataTable extends DataTable
             ->columns($this->getColumns())
             ->ajax(route('unit_kerja.index'))
             ->orderBy(1)
-            ->selectStyleSingle();
+            ->selectStyleSingle()
+            ->responsive(false);
     }
 
     /**

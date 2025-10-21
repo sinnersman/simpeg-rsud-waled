@@ -20,8 +20,10 @@
                     <a href="{{ route('induk_unit_kerja.trash') }}" class="btn btn-danger">Recycle Bin</a>
                 </div>
                 
-                <div class="table dataTable">
-                    {{ $dataTable->table() }}
+                <div class="table-responsive">
+                    <div class="table dataTable">
+                        {{ $dataTable->table() }}
+                    </div>
                 </div>
             </div>
         </div>
