@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Pegawai;
-use Illuminate\Support\Facades\Storage;
 use App\DataTables\PegawaiDataTable;
-use Indonesia;
+use App\Models\Pegawai;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Indonesia;
 
 class PegawaiController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-
     public function index(PegawaiDataTable $dataTable)
     {
         $title = 'Data Pegawai';
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
-            ['name' => 'Data Pegawai', 'active' => true]
+            ['name' => 'Data Pegawai', 'active' => true],
         ];
+
         return $dataTable->render('pegawai.index', compact('title', 'breadcrumbs'));
     }
 
@@ -34,8 +37,9 @@ class PegawaiController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Data Pegawai', 'url' => route('pegawai.index')],
-            ['name' => 'Tambah Pegawai', 'active' => true]
+            ['name' => 'Tambah Pegawai', 'active' => true],
         ];
+
         return view('pegawai.create', compact('title', 'breadcrumbs'));
     }
 
@@ -118,7 +122,7 @@ class PegawaiController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Data Pegawai', 'url' => route('pegawai.index')],
-            ['name' => 'Detail Pegawai', 'active' => true]
+            ['name' => 'Detail Pegawai', 'active' => true],
         ];
 
         return view('pegawai.show', compact('pegawai', 'title', 'breadcrumbs'));
@@ -134,8 +138,9 @@ class PegawaiController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Data Pegawai', 'url' => route('pegawai.index')],
-            ['name' => 'Edit Pegawai', 'active' => true]
+            ['name' => 'Edit Pegawai', 'active' => true],
         ];
+
         return view('pegawai.edit', compact('pegawai', 'title', 'breadcrumbs'));
     }
 
@@ -148,7 +153,7 @@ class PegawaiController extends Controller
 
         $validatedData = $request->validate([
             'foto_pegawai' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'nip' => 'required|string|unique:pegawai,nip,' . $id . '|max:255',
+            'nip' => 'required|string|unique:pegawai,nip,'.$id.'|max:255',
             'nip_lama' => 'nullable|string|max:255',
             'nama_lengkap' => 'required|string|max:255',
             'nama_panggilan' => 'nullable|string|max:255',
@@ -165,7 +170,7 @@ class PegawaiController extends Controller
             'suku' => 'nullable|string|max:255',
             'alamat_lengkap' => 'nullable|string',
             'kode_pos' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:pegawai,email,' . $id . '|max:255',
+            'email' => 'nullable|email|unique:pegawai,email,'.$id.'|max:255',
             'fax' => 'nullable|string|max:255',
             'telephone' => 'nullable|string|max:255',
             'handphone' => 'nullable|string|max:255',
@@ -235,6 +240,28 @@ class PegawaiController extends Controller
     {
         $pegawai = Pegawai::findOrFail($id);
         $pdf = Pdf::loadView('pegawai.pdf', compact('pegawai'));
-        return $pdf->download('pegawai-' . $pegawai->nip . '.pdf');
+
+        return $pdf->download('pegawai-'.$pegawai->nip.'.pdf');
+    }
+
+    public function createAccount(Pegawai $pegawai)
+    {
+        // Generate a random password
+        $password = Str::random(10);
+
+        // Create user account
+        User::create([
+            'name' => $pegawai->nama_lengkap,
+            'username' => $pegawai->nip,
+            'email' => $pegawai->email, // Assuming email is optional and can be null
+            'password' => Hash::make($password),
+            'role' => 'pegawai',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Akun berhasil dibuat.',
+            'password' => $password,
+        ]);
     }
 }

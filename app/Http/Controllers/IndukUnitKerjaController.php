@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\IndukUnitKerjaDataTable;
 use App\Models\IndukUnitKerja;
 use Illuminate\Http\Request;
-use App\DataTables\IndukUnitKerjaDataTable;
 
 class IndukUnitKerjaController extends Controller
 {
@@ -16,8 +16,9 @@ class IndukUnitKerjaController extends Controller
         $title = 'Master Induk Unit Kerja';
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
-            ['name' => 'Master Induk Unit Kerja', 'active', true]
+            ['name' => 'Master Induk Unit Kerja', 'active', true],
         ];
+
         return $dataTable->render('induk_unit_kerja.index', compact('title', 'breadcrumbs'));
     }
 
@@ -30,8 +31,9 @@ class IndukUnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Induk Unit Kerja', 'url' => route('induk_unit_kerja.index')],
-            ['name' => 'Tambah Induk Unit Kerja', 'active', true]
+            ['name' => 'Tambah Induk Unit Kerja', 'active', true],
         ];
+
         return view('induk_unit_kerja.create', compact('title', 'breadcrumbs'));
     }
 
@@ -68,8 +70,9 @@ class IndukUnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Induk Unit Kerja', 'url', route('induk_unit_kerja.index')],
-            ['name' => 'Edit Induk Unit Kerja', 'active', true]
+            ['name' => 'Edit Induk Unit Kerja', 'active', true],
         ];
+
         return view('induk_unit_kerja.edit', compact('indukUnitKerja', 'title', 'breadcrumbs'));
     }
 
@@ -79,7 +82,7 @@ class IndukUnitKerjaController extends Controller
     public function update(Request $request, IndukUnitKerja $indukUnitKerja)
     {
         $request->validate([
-            'kode' => 'required|string|unique:induk_unit_kerja,kode,' . $indukUnitKerja->id . '|max:255',
+            'kode' => 'required|string|unique:induk_unit_kerja,kode,'.$indukUnitKerja->id.'|max:255',
             'nama_induk_unit_kerja' => 'required|string|max:255',
         ]);
 
@@ -110,8 +113,9 @@ class IndukUnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Induk Unit Kerja', 'url' => route('induk_unit_kerja.index')],
-            ['name' => 'Recycle Bin Induk Unit Kerja', 'active', true]
+            ['name' => 'Recycle Bin Induk Unit Kerja', 'active', true],
         ];
+
         return view('induk_unit_kerja.trash', compact('indukUnitKerjas', 'title', 'breadcrumbs'));
     }
 

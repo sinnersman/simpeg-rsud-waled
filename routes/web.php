@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PegawaiController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DependentDropdownController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +18,6 @@ Route::get('/', function () {
     }
 });
 
-
 Route::get('/provinces', [DependentDropdownController::class, 'provinces'])->name('provinces');
 Route::get('/cities', [DependentDropdownController::class, 'cities'])->name('cities');
 Route::get('/districts', [DependentDropdownController::class, 'districts'])->name('districts');
@@ -27,6 +26,7 @@ Route::get('/villages', [DependentDropdownController::class, 'villages'])->name(
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
     Route::resource('pegawai', PegawaiController::class);
+    Route::post('/pegawai/{pegawai}/create-account', [PegawaiController::class, 'createAccount'])->name('pegawai.createAccount');
     Route::get('/pegawai/{id}/pdf', [PegawaiController::class, 'generatePDF'])->name('pegawai.pdf');
 
     // Master Jabatan

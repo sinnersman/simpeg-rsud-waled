@@ -15,10 +15,9 @@ class DashboardController extends Controller
             'title' => 'Dashboard',
             'breadcrumbs' => [
                 ['name' => 'Main'],
-                ['name' => 'Dashboard','url' => route('dashboard.index')],
-            ]
+                ['name' => 'Dashboard', 'url' => route('dashboard.index')],
+            ],
         ];
-
 
         return view('dashboard', $data);
     }
@@ -78,9 +77,8 @@ class DashboardController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => route('dashboard.index')],
                 ['name' => 'Dashboard'],
-            ]
+            ],
         ];
-
 
         return view('settings', $data);
     }

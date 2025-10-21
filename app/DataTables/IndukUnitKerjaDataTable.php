@@ -6,10 +6,7 @@ use App\Models\IndukUnitKerja;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class IndukUnitKerjaDataTable extends DataTable
@@ -17,7 +14,7 @@ class IndukUnitKerjaDataTable extends DataTable
     /**
      * Build the DataTable class.
      *
-     * @param QueryBuilder<IndukUnitKerja> $query Results from query() method.
+     * @param  QueryBuilder<IndukUnitKerja>  $query  Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
@@ -45,11 +42,11 @@ class IndukUnitKerjaDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('indukunitkerja-table')
-                    ->columns($this->getColumns())
-                    ->ajax(route('induk_unit_kerja.index'))
-                    ->orderBy(1)
-                    ->selectStyleSingle();
+            ->setTableId('indukunitkerja-table')
+            ->columns($this->getColumns())
+            ->ajax(route('induk_unit_kerja.index'))
+            ->orderBy(1)
+            ->selectStyleSingle();
     }
 
     /**
@@ -62,10 +59,10 @@ class IndukUnitKerjaDataTable extends DataTable
             Column::make('kode'),
             Column::make('nama_induk_unit_kerja')->title('Nama Induk Unit Kerja'),
             Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
+                ->exportable(false)
+                ->printable(false)
+                ->width(60)
+                ->addClass('text-center'),
         ];
     }
 
@@ -74,6 +71,6 @@ class IndukUnitKerjaDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'IndukUnitKerja_' . date('YmdHis');
+        return 'IndukUnitKerja_'.date('YmdHis');
     }
 }

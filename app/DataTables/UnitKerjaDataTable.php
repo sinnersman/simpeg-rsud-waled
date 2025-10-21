@@ -6,10 +6,7 @@ use App\Models\UnitKerja;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class UnitKerjaDataTable extends DataTable
@@ -17,7 +14,7 @@ class UnitKerjaDataTable extends DataTable
     /**
      * Build the DataTable class.
      *
-     * @param QueryBuilder<UnitKerja> $query Results from query() method.
+     * @param  QueryBuilder<UnitKerja>  $query  Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
@@ -48,11 +45,11 @@ class UnitKerjaDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('unitkerja-table')
-                    ->columns($this->getColumns())
-                    ->ajax(route('unit_kerja.index'))
-                    ->orderBy(1)
-                    ->selectStyleSingle();
+            ->setTableId('unitkerja-table')
+            ->columns($this->getColumns())
+            ->ajax(route('unit_kerja.index'))
+            ->orderBy(1)
+            ->selectStyleSingle();
     }
 
     /**
@@ -66,10 +63,10 @@ class UnitKerjaDataTable extends DataTable
             Column::make('kode'),
             Column::make('nama_unit_kerja')->title('Nama Unit Kerja'),
             Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
+                ->exportable(false)
+                ->printable(false)
+                ->width(60)
+                ->addClass('text-center'),
         ];
     }
 
@@ -78,6 +75,6 @@ class UnitKerjaDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'UnitKerja_' . date('YmdHis');
+        return 'UnitKerja_'.date('YmdHis');
     }
 }

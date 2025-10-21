@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UnitKerja;
-use App\Models\IndukUnitKerja;
-use Illuminate\Http\Request;
 use App\DataTables\UnitKerjaDataTable;
+use App\Models\IndukUnitKerja;
+use App\Models\UnitKerja;
+use Illuminate\Http\Request;
 
 class UnitKerjaController extends Controller
 {
@@ -17,8 +17,9 @@ class UnitKerjaController extends Controller
         $title = 'Master Unit Kerja';
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
-            ['name' => 'Master Unit Kerja', 'active' => true]
+            ['name' => 'Master Unit Kerja', 'active' => true],
         ];
+
         return $dataTable->render('unit_kerja.index', compact('title', 'breadcrumbs'));
     }
 
@@ -32,8 +33,9 @@ class UnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Unit Kerja', 'url' => route('unit_kerja.index')],
-            ['name' => 'Tambah Unit Kerja', 'active' => true]
+            ['name' => 'Tambah Unit Kerja', 'active' => true],
         ];
+
         return view('unit_kerja.create', compact('indukUnitKerjas', 'title', 'breadcrumbs'));
     }
 
@@ -72,8 +74,9 @@ class UnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Unit Kerja', 'url' => route('unit_kerja.index')],
-            ['name' => 'Edit Unit Kerja', 'active', true]
+            ['name' => 'Edit Unit Kerja', 'active', true],
         ];
+
         return view('unit_kerja.edit', compact('unitKerja', 'indukUnitKerjas', 'title', 'breadcrumbs'));
     }
 
@@ -84,7 +87,7 @@ class UnitKerjaController extends Controller
     {
         $request->validate([
             'induk_unit_kerja_id' => 'required|exists:induk_unit_kerja,id',
-            'kode' => 'required|string|unique:unit_kerja,kode,' . $unitKerja->id . '|max:255',
+            'kode' => 'required|string|unique:unit_kerja,kode,'.$unitKerja->id.'|max:255',
             'nama_unit_kerja' => 'required|string|max:255',
         ]);
 
@@ -115,8 +118,9 @@ class UnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Unit Kerja', 'url' => route('unit_kerja.index')],
-            ['name' => 'Recycle Bin Unit Kerja', 'active' => true]
+            ['name' => 'Recycle Bin Unit Kerja', 'active' => true],
         ];
+
         return view('unit_kerja.trash', compact('unitKerjas', 'title', 'breadcrumbs'));
     }
 

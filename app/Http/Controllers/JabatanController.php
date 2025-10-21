@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\JabatanDataTable;
 use App\Models\Jabatan;
 use Illuminate\Http\Request;
-use App\DataTables\JabatanDataTable;
 
 class JabatanController extends Controller
 {
@@ -16,8 +16,9 @@ class JabatanController extends Controller
         $title = 'Master Jabatan';
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
-            ['name' => 'Master Jabatan', 'active' => true]
+            ['name' => 'Master Jabatan', 'active' => true],
         ];
+
         return $dataTable->render('jabatan.index', compact('title', 'breadcrumbs'));
     }
 
@@ -44,7 +45,6 @@ class JabatanController extends Controller
         return redirect()->route('jabatan.index')
             ->with('success', 'Jabatan created successfully.');
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -87,6 +87,7 @@ class JabatanController extends Controller
     public function trash()
     {
         $jabatans = Jabatan::onlyTrashed()->get();
+
         return view('jabatan.trash', compact('jabatans'));
     }
 

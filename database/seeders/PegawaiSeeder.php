@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\Pegawai; // Import the Pegawai model
-use Faker\Factory as Faker; // Import Faker
+use App\Models\Pegawai;
+use Faker\Factory as Faker; // Import the Pegawai model
+use Illuminate\Database\Seeder; // Import Faker
 
 class PegawaiSeeder extends Seeder
 {
