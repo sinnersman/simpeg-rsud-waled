@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\UserDataTable;
+use App\Models\Pegawai;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -38,7 +40,13 @@ class UserController extends Controller
         ];
         $roles = Role::all();
 
-        return view('users.create', compact('title', 'breadcrumbs', 'roles'));
+        // Get NIPs of existing users
+        $existingUserNips = User::whereNotNull('username')->pluck('username')->toArray();
+
+        // Get Pegawai who do not have a user account yet (NIP not in existingUserNips)
+        $availablePegawai = Pegawai::whereNotIn('nip', $existingUserNips)->get();
+
+        return view('users.create', compact('title', 'breadcrumbs', 'roles', 'availablePegawai'));
     }
 
     /**
@@ -46,22 +54,40 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $availableRoles = Role::pluck('name')->toArray();
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'email' => 'nullable|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => ['required', 'string', Rule::in($availableRoles)],
-        ]);
+        ];
 
-        User::create([
+        $userData = [
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+        ];
+
+        if ($request->user_type === 'new') {
+            $availableRoles = Role::pluck('name')->toArray();
+            $rules['password'] = 'required|string|min:8|confirmed';
+            $rules['role'] = ['required', 'string', Rule::in($availableRoles)];
+            $userData['password'] = Hash::make($request->password);
+            $userData['role'] = $request->role;
+        } elseif ($request->user_type === 'pegawai') {
+            $rules['pegawai_id'] = 'required|exists:pegawai,id';
+            // For pegawai, password will be generated, and role will be 'pegawai'
+            // We don't need password or role from request for validation here
+            // The name, username (nip), email will come from the selected pegawai
+            $pegawai = Pegawai::findOrFail($request->pegawai_id);
+            $userData['name'] = $pegawai->nama_lengkap;
+            $userData['username'] = $pegawai->nip;
+            $userData['email'] = $pegawai->email; // Use pegawai's email
+            $userData['password'] = Hash::make(Str::random(10)); // Generate random password
+            $userData['role'] = 'pegawai'; // Default role for pegawai
+        }
+
+        $request->validate($rules);
+
+        User::create($userData);
 
         return redirect()->route('users.index')
             ->with('success', 'Pengguna berhasil ditambahkan.');
@@ -155,5 +181,43 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'Pengguna berhasil dinonaktifkan.');
+    }
+
+    /**
+     * Generate a user account for a selected Pegawai.
+     */
+    public function generatePegawaiAccount(Request $request)
+    {
+        $request->validate([
+            'pegawai_id' => 'required|exists:pegawai,id',
+        ]);
+
+        $pegawai = Pegawai::findOrFail($request->pegawai_id);
+
+        // Check if user already exists for this NIP
+        if (User::where('username', $pegawai->nip)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun untuk NIP ini sudah ada.',
+            ], 409); // Conflict
+        }
+
+        $password = Str::random(10);
+
+        User::create([
+            'name' => $pegawai->nama_lengkap,
+            'username' => $pegawai->nip,
+            'email' => $pegawai->email,
+            'password' => Hash::make($password),
+            'role' => 'pegawai',
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Akun berhasil dibuat.',
+            'username' => $pegawai->nip,
+            'password' => $password,
+        ]);
     }
 }

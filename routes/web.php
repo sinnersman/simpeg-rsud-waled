@@ -54,6 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // User Management
     Route::resource('users', UserController::class);
+    Route::post('users/generate-pegawai-account', [UserController::class, 'generatePegawaiAccount'])->name('users.generatePegawaiAccount');
     Route::patch('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
     Route::patch('users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 
