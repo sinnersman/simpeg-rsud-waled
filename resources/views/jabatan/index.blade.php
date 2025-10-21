@@ -16,9 +16,13 @@
                 <h4 class="card-title">Daftar Data Jabatan</h4>
                 <p class="text-muted mb-3">Berikut adalah daftar semua data jabatan yang terdaftar.</p>
                 <div class="text-end mb-3">
-    <a href="{{ route('jabatan.create') }}" class="btn btn-primary">Tambah Jabatan</a>
-    <a href="{{ route('jabatan.trash') }}" class="btn btn-danger">Recycle Bin</a>
-</div>
+                    <a href="{{ route('jabatan.create') }}" class="btn btn-primary">Tambah Jabatan</a>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+                        Import Excel
+                    </button>
+                    <a href="{{ route('jabatan.downloadTemplate') }}" class="btn btn-info">Download Template</a>
+                    <a href="{{ route('jabatan.trash') }}" class="btn btn-danger">Recycle Bin</a>
+                </div>
                 
                 <div class="table-responsive">
                     <div class="table dataTable">
@@ -26,6 +30,31 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Excel Modal -->
+<div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importExcelModalLabel">Import Data Jabatan dari Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('jabatan.importExcel') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="excel_file" class="form-label">Pilih File Excel</label>
+                        <input class="form-control" type="file" id="excel_file" name="excel_file" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

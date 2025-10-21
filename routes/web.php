@@ -35,6 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('jabatan/trash', [\App\Http\Controllers\JabatanController::class, 'trash'])->name('jabatan.trash');
     Route::get('jabatan/{id}/restore', [\App\Http\Controllers\JabatanController::class, 'restore'])->name('jabatan.restore');
     Route::delete('jabatan/{id}/force-delete', [\App\Http\Controllers\JabatanController::class, 'forceDelete'])->name('jabatan.forceDelete');
+    Route::get('jabatan/download-template', [\App\Http\Controllers\JabatanController::class, 'downloadTemplate'])->name('jabatan.downloadTemplate');
+    Route::post('jabatan/import-excel', [\App\Http\Controllers\JabatanController::class, 'importExcel'])->name('jabatan.importExcel');
     Route::resource('jabatan', \App\Http\Controllers\JabatanController::class)->except(['show']);
 
     // Master Induk Unit Kerja

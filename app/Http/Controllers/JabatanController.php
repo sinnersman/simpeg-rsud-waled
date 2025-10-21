@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\JabatanDataTable;
+use App\Imports\JabatanImport;
 use App\Models\Jabatan;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class JabatanController extends Controller
 {
@@ -113,5 +117,39 @@ class JabatanController extends Controller
 
         return redirect()->route('jabatan.trash')
             ->with('success', 'Jabatan permanently deleted successfully');
+    }
+
+    /**
+     * Download Excel template for Jabatan.
+     */
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet;
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'kode_jabatan');
+        $sheet->setCellValue('B1', 'nama_jabatan');
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template_jabatan.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Import Excel data for Jabatan.
+     */
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new JabatanImport, $request->file('excel_file'));
+
+        return redirect()->route('jabatan.index')
+            ->with('success', 'Data Jabatan berhasil diimpor.');
     }
 }
