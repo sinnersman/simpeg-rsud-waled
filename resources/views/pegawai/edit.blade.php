@@ -1,6 +1,26 @@
 @extends('layouts.app')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('/') }}assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">
+@endpush
+
 @section('content')
+
+@if(session('success'))
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+
+@if(session('info'))
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+    {{ session('info') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+
 <div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
@@ -21,6 +41,11 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Keterangan Tambahan</button>
                     </li>
+                    @if(auth()->user()->role === 'pegawai')
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">Riwayat Pengajuan Perubahan</button>
+                    </li>
+                    @endif
                 </ul>
 
                 <form method="POST" action="{{ auth()->user()->role === 'pegawai' ? route('pegawai.myBiodataUpdate') : route('pegawai.update', $pegawai->id) }}" enctype="multipart/form-data">
@@ -284,6 +309,18 @@
                             </div>
                         </div>
                         
+                        @if(auth()->user()->role === 'pegawai')
+                        {{-- Riwayat Pengajuan Perubahan Tab --}}
+                        <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                            <h5 class="mb-3 mt-4">Riwayat Pengajuan Perubahan Biodata</h5>
+                            <div class="table-responsive">
+                                <div class="table dataTable">
+                                    {{ $dataTable->table() }}
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                        
                         <button type="submit" class="btn btn-primary me-2">Update Data</button>
                                                 <a href="{{ auth()->user()->role === 'pegawai' ? route('dashboard.index') : route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
                     </div>
@@ -292,6 +329,25 @@
         </div>
     </div>
 </div>
+
+<!-- Rejection Reason Modal -->
+<div class="modal fade" id="rejectionReasonModal" tabindex="-1" aria-labelledby="rejectionReasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectionReasonModalLabel">Alasan Penolakan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalRejectionReason"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -300,6 +356,18 @@
     .tab-pane.active.show { display: block; }
     .tab-content { min-height: auto !important; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('/') }}assets/vendors/jquery/jquery.min.js"></script>
+<script src="{{ asset('/') }}assets/vendors/datatables.net/dataTables.js"></script>
+<script src="{{ asset('/') }}assets/vendors/datatables.net-bs5/dataTables.bootstrap5.js"></script>
+
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+
+{{-- Explicitly load Select2 JS here to ensure it's available --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const fotoPegawaiInput = document.getElementById('foto_pegawai');
@@ -337,7 +405,74 @@
 </script>
 <script>
     $(document).ready(function () {
-        // Populate provinces on page load
+        // Initialize Select2 for all relevant dropdowns
+        $('#provinsi, #kabupaten, #kecamatan, #kelurahan, #jenis_kelamin, #agama, #golongan_darah, #status_perkawinan, #pendidikan_terakhir, #status_kepegawaian').select2({
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+        });
+
+        // Function to load cities based on province
+        function loadCities(provinceID, existingCity = null) {
+            return $.ajax({
+                url: "{{ route('cities') }}",
+                type: "GET",
+                data: { id: provinceID },
+                dataType: "json",
+                success: function (data) {
+                    $('#kabupaten').empty().append('<option value="">- Pilih Kabupaten -</option>');
+                    $.each(data, function (key, value) {
+                        $('#kabupaten').append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                    if (existingCity) {
+                        $('#kabupaten').val(existingCity);
+                    }
+                    $('#kabupaten').trigger('change.select2');
+                }
+            });
+        }
+
+        // Function to load districts based on city
+        function loadDistricts(cityID, existingDistrict = null) {
+            return $.ajax({
+                url: "{{ route('districts') }}",
+                type: "GET",
+                data: { id: cityID },
+                dataType: "json",
+                success: function (data) {
+                    $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>');
+                    $.each(data, function (key, value) {
+                        $('#kecamatan').append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                    if (existingDistrict) {
+                        $('#kecamatan').val(existingDistrict);
+                    }
+                    $('#kecamatan').trigger('change.select2');
+                }
+            });
+        }
+
+        // Function to load villages based on district
+        function loadVillages(districtID, existingVillage = null) {
+            return $.ajax({
+                url: "{{ route('villages') }}",
+                type: "GET",
+                data: { id: districtID },
+                dataType: "json",
+                success: function (data) {
+                    $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
+                    $.each(data, function (key, value) {
+                        $('#kelurahan').append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                    if (existingVillage) {
+                        $('#kelurahan').val(existingVillage);
+                    }
+                    $('#kelurahan').trigger('change.select2');
+                }
+            });
+        }
+
+        // Initial load for provinces and cascading selection
         $.ajax({
             url: "{{ route('provinces') }}",
             type: "GET",
@@ -347,106 +482,83 @@
                 $.each(data, function (key, value) {
                     $('#provinsi').append('<option value="' + value.id + '">' + value.name + '</option>');
                 });
-                // Pre-select existing province
-                var existingProvince = "{{ old('provinsi', $pegawai->provinsi) }}";
-                if (existingProvince) {
-                    $('#provinsi').val(existingProvince).trigger('change');
+                var selectedProvinceId = "{{ $selectedProvinceId }}"; // Use the ID from the controller
+                if (selectedProvinceId) {
+                    $('#provinsi').val(selectedProvinceId);
+                    $('#provinsi').trigger('change.select2'); // Trigger Select2 update
+                    
+                    // Chain the next AJAX call
+                    loadCities(selectedProvinceId, "{{ $selectedCityId }}") // Pass ID for city
+                        .done(function() {
+                            var selectedCityId = "{{ $selectedCityId }}";
+                            if (selectedCityId) {
+                                loadDistricts(selectedCityId, "{{ $selectedDistrictId }}") // Pass ID for district
+                                    .done(function() {
+                                        var selectedDistrictId = "{{ $selectedDistrictId }}";
+                                        if (selectedDistrictId) {
+                                            loadVillages(selectedDistrictId, "{{ $selectedVillageId }}"); // Pass ID for village
+                                        }
+                                    });
+                            }
+                        });
+                } else {
+                    $('#provinsi').trigger('change.select2'); // Trigger Select2 update even if no existing province
                 }
             }
         });
 
-        // Handle province change
+        // Event listeners for changes
         $('#provinsi').on('change', function () {
             var provinceID = $(this).val();
             if (provinceID) {
-                $.ajax({
-                    url: "{{ route('cities') }}",
-                    type: "GET",
-                    data: { id: provinceID },
-                    dataType: "json",
-                    success: function (data) {
-                        $('#kabupaten').empty().append('<option value="">- Pilih Kabupaten -</option>');
-                        $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>');
-                        $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
-                        $.each(data, function (key, value) {
-                            $('#kabupaten').append('<option value="' + value.id + '">' + value.name + '</option>');
-                        });
-                        // Pre-select existing city
-                        var existingCity = "{{ old('kabupaten', $pegawai->kabupaten) }}";
-                        if (existingCity) {
-                            $('#kabupaten').val(existingCity).trigger('change');
-                        }
-                    }
-                });
+                loadCities(provinceID);
             } else {
-                $('#kabupaten').empty().append('<option value="">- Pilih Kabupaten -</option>');
-                $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>');
-                $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
+                $('#kabupaten').empty().append('<option value="">- Pilih Kabupaten -</option>').trigger('change.select2');
+                $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>').trigger('change.select2');
+                $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>').trigger('change.select2');
             }
         });
 
-        // Handle city change
         $('#kabupaten').on('change', function () {
             var cityID = $(this).val();
             if (cityID) {
-                $.ajax({
-                    url: "{{ route('districts') }}",
-                    type: "GET",
-                    data: { id: cityID },
-                    dataType: "json",
-                    success: function (data) {
-                        $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>');
-                        $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
-                        $.each(data, function (key, value) {
-                            $('#kecamatan').append('<option value="' + value.id + '">' + value.name + '</option>');
-                        });
-                        // Pre-select existing district
-                        var existingDistrict = "{{ old('kecamatan', $pegawai->kecamatan) }}";
-                        if (existingDistrict) {
-                            $('#kecamatan').val(existingDistrict).trigger('change');
-                        }
-                    }
-                });
+                loadDistricts(cityID);
             } else {
-                $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>');
-                $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
+                $('#kecamatan').empty().append('<option value="">- Pilih Kecamatan -</option>').trigger('change.select2');
+                $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>').trigger('change.select2');
             }
         });
 
-        // Handle district change
         $('#kecamatan').on('change', function () {
             var districtID = $(this).val();
             if (districtID) {
-                $.ajax({
-                    url: "{{ route('villages') }}",
-                    type: "GET",
-                    data: { id: districtID },
-                    dataType: "json",
-                    success: function (data) {
-                        $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
-                        $.each(data, function (key, value) {
-                            $('#kelurahan').append('<option value="' + value.id + '">' + value.name + '</option>');
-                        });
-                        // Pre-select existing village
-                        var existingVillage = "{{ old('kelurahan', $pegawai->kelurahan) }}";
-                        if (existingVillage) {
-                            $('#kelurahan').val(existingVillage).trigger('change');
-                        }
-                    }
-                });
+                loadVillages(districtID);
             } else {
-                $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>');
+                $('#kelurahan').empty().append('<option value="">- Pilih Kelurahan -</option>').trigger('change.select2');
             }
         });
 
-        // Pre-select existing values for static dropdowns
-        $('#jenis_kelamin').val("{{ old('jenis_kelamin', $pegawai->jenis_kelamin) }}");
-        $('#agama').val("{{ old('agama', $pegawai->agama) }}");
-        $('#golongan_darah').val("{{ old('golongan_darah', $pegawai->golongan_darah) }}");
-        $('#status_perkawinan').val("{{ old('status_perkawinan', $pegawai->status_perkawinan) }}");
-        $('#pendidikan_terakhir').val("{{ old('pendidikan_terakhir', $pegawai->pendidikan_terakhir) }}");
-        $('#status_kepegawaian').val("{{ old('status_kepegawaian', $pegawai->status_kepegawaian) }}");
+        // Pre-select existing values for static dropdowns and trigger Select2 update
+        $('#jenis_kelamin').val("{{ old('jenis_kelamin', $pegawai->jenis_kelamin) }}").trigger('change.select2');
+        $('#agama').val("{{ old('agama', $pegawai->agama) }}").trigger('change.select2');
+        $('#golongan_darah').val("{{ old('golongan_darah', $pegawai->golongan_darah) }}").trigger('change.select2');
+        $('#status_perkawinan').val("{{ old('status_perkawinan', $pegawai->status_perkawinan) }}").trigger('change.select2');
+        $('#pendidikan_terakhir').val("{{ old('pendidikan_terakhir', $pegawai->pendidikan_terakhir) }}").trigger('change.select2');
+        $('#status_kepegawaian').val("{{ old('status_kepegawaian', $pegawai->status_kepegawaian) }}").trigger('change.select2');
 
     });
 </script>
+<script>
+    $(document).ready(function() {
+        $('#rejectionReasonModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var reason = button.data('reason'); // Extract info from data-* attributes
+            var modal = $(this);
+            modal.find('#modalRejectionReason').text(reason);
+        });
+    });
+</script>
+@if(auth()->user()->role === 'pegawai')
+{{ $dataTable->scripts() }}
+@endif
 @endpush

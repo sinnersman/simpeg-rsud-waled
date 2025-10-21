@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Indonesia;
+use App\DataTables\PegawaiChangeRequestDataTable;
+use Laravolt\Indonesia\Models\Province;
+use Laravolt\Indonesia\Models\City;
+use Laravolt\Indonesia\Models\District;
+use Laravolt\Indonesia\Models\Village;
 
 class PegawaiController extends Controller
 {
@@ -143,7 +148,25 @@ class PegawaiController extends Controller
             ['name' => 'Edit Pegawai', 'active' => true],
         ];
 
-        return view('pegawai.edit', compact('pegawai', 'title', 'breadcrumbs'));
+        // Pass null for $dataTable when accessed by superadmin
+        $dataTable = null;
+
+        // Pass null for selected location IDs when accessed by superadmin
+        $selectedProvinceId = null;
+        $selectedCityId = null;
+        $selectedDistrictId = null;
+        $selectedVillageId = null;
+
+        return view('pegawai.edit', compact(
+            'pegawai',
+            'title',
+            'breadcrumbs',
+            'dataTable',
+            'selectedProvinceId',
+            'selectedCityId',
+            'selectedDistrictId',
+            'selectedVillageId'
+        ));
     }
 
     /**
@@ -269,7 +292,7 @@ class PegawaiController extends Controller
         ]);
     }
 
-    public function myBiodataEdit()
+    public function myBiodataEdit(PegawaiChangeRequestDataTable $dataTable) // Inject the DataTable
     {
         $pegawai = Pegawai::where('nip', auth()->user()->username)->first();
 
@@ -278,7 +301,7 @@ class PegawaiController extends Controller
             $title = 'Lengkapi Biodata Saya';
             $breadcrumbs = [
                 ['name' => 'Dashboard', 'url' => route('dashboard.index')],
-                ['name' => 'Lengkapi Biodata', 'active' => true],
+                ['name' => 'Lengkapi Biodata', 'active', true],
             ];
             // Pass an empty Pegawai object to the create view
             return view('pegawai.create', compact('title', 'breadcrumbs'));
@@ -291,7 +314,62 @@ class PegawaiController extends Controller
             ['name' => 'Biodata Saya', 'active', true],
         ];
 
-        return view('pegawai.edit', compact('pegawai', 'title', 'breadcrumbs'));
+        // Pass the pegawaiId to the DataTable instance
+        $dataTable->pegawaiId = $pegawai->id;
+
+        // Convert stored names to IDs for pre-selection in dropdowns
+        $selectedProvinceId = null;
+        $selectedCityId = null;
+        $selectedDistrictId = null;
+        $selectedVillageId = null;
+
+        if ($pegawai->provinsi) {
+            $provinceName = trim($pegawai->provinsi);
+            $province = Province::whereRaw('LOWER(name) = ?', [strtolower($provinceName)])->first();
+            if ($province) {
+                $selectedProvinceId = $province->id;
+
+                if ($pegawai->kabupaten) {
+                    $cityName = trim($pegawai->kabupaten);
+                    $city = City::where('province_code', $selectedProvinceId) // Changed from province_id to province_code
+                                ->whereRaw('LOWER(name) = ?', [strtolower($cityName)])
+                                ->first();
+                    if ($city) {
+                        $selectedCityId = $city->id;
+
+                        if ($pegawai->kecamatan) {
+                            $districtName = trim($pegawai->kecamatan);
+                            $district = District::where('city_code', $selectedCityId) // Changed from city_id to city_code
+                                                ->whereRaw('LOWER(name) = ?', [strtolower($districtName)])
+                                                ->first();
+                            if ($district) {
+                                $selectedDistrictId = $district->id;
+
+                                if ($pegawai->kelurahan) {
+                                    $villageName = trim($pegawai->kelurahan);
+                                    $village = Village::where('district_code', $selectedDistrictId) // Changed from district_id to district_code
+                                                    ->whereRaw('LOWER(name) = ?', [strtolower($villageName)])
+                                                    ->first();
+                                    if ($village) {
+                                        $selectedVillageId = $village->id;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $dataTable->render('pegawai.edit', compact(
+            'pegawai',
+            'title',
+            'breadcrumbs',
+            'selectedProvinceId',
+            'selectedCityId',
+            'selectedDistrictId',
+            'selectedVillageId'
+        ));
     }
 
     public function myBiodataUpdate(Request $request)
@@ -370,10 +448,22 @@ class PegawaiController extends Controller
                     // Convert IDs to names for display in change request
                     if (in_array($field, ['provinsi', 'kabupaten', 'kecamatan', 'kelurahan'])) {
                         $oldValueDisplay = $pegawai->$field; // Use current value for old_value display
-                        if ($field === 'provinsi') $newValue = Indonesia::findProvince($newValue)->name;
-                        if ($field === 'kabupaten') $newValue = Indonesia::findCity($newValue)->name;
-                        if ($field === 'kecamatan') $newValue = Indonesia::findDistrict($newValue)->name;
-                        if ($field === 'kelurahan') $newValue = Indonesia::findVillage($newValue)->name;
+                        if ($field === 'provinsi') {
+                            $province = Indonesia::findProvince($newValue);
+                            $newValue = $province ? $province->name : $newValue; // Use name if found, else keep ID
+                        }
+                        if ($field === 'kabupaten') {
+                            $city = Indonesia::findCity($newValue);
+                            $newValue = $city ? $city->name : $newValue; // Use name if found, else keep ID
+                        }
+                        if ($field === 'kecamatan') {
+                            $district = Indonesia::findDistrict($newValue);
+                            $newValue = $district ? $district->name : $newValue; // Use name if found, else keep ID
+                        }
+                        if ($field === 'kelurahan') {
+                            $village = Indonesia::findVillage($newValue);
+                            $newValue = $village ? $village->name : $newValue; // Use name if found, else keep ID
+                        }
                         $oldValue = $oldValueDisplay; // Reassign old value for storage
                     }
 

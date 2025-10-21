@@ -14,24 +14,37 @@ class DependentDropdownController extends Controller
         return response()->json($provinces);
     }
 
-    public function cities(Request $request)
-    {
-        $cities = Indonesia::findProvince($request->get('id'), ['cities']);
+        public function cities(Request $request)
 
-        return response()->json($cities->cities);
-    }
+        {
 
-    public function districts(Request $request)
-    {
-        $districts = Indonesia::findCity($request->get('id'), ['districts']);
+            $cities = Indonesia::findProvince($request->get('id'), ['cities']);
 
-        return response()->json($districts->districts);
-    }
+            return response()->json($cities ? $cities->cities : []); // Add null check
 
-    public function villages(Request $request)
-    {
-        $villages = Indonesia::findDistrict($request->get('id'), ['villages']);
+        }
 
-        return response()->json($villages->villages);
-    }
+    
+
+        public function districts(Request $request)
+
+        {
+
+            $districts = Indonesia::findCity($request->get('id'), ['districts']);
+
+            return response()->json($districts ? $districts->districts : []); // Add null check
+
+        }
+
+    
+
+        public function villages(Request $request)
+
+        {
+
+            $villages = Indonesia::findDistrict($request->get('id'), ['villages']);
+
+            return response()->json($villages ? $villages->villages : []); // Add null check
+
+        }
 }
