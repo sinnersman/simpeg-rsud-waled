@@ -21,7 +21,7 @@ class DokumenKaryawanDataTable extends DataTable
                 return $row->pegawai ? $row->pegawai->nama_lengkap : 'N/A';
             })
             ->editColumn('file_path', function ($row) {
-                return '<a href="' . Storage::url($row->file_path) . '" target="_blank">Lihat File</a>';
+                return '<a href="' . Storage::url($row->file_path) . '" target="_blank" class="btn btn-sm btn-info">Lihat File</a>';
             })
             ->addColumn('action', function ($row) {
                 return view('dokumen_karyawan.action', compact('row'))->render();
@@ -52,17 +52,9 @@ class DokumenKaryawanDataTable extends DataTable
             ->setTableId('dokumenkaryawan-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->dom('Bfrtip')
             ->orderBy(1)
             ->selectStyleSingle()
-            ->buttons([
-                Button::make('excel'),
-                Button::make('csv'),
-                Button::make('pdf'),
-                Button::make('print'),
-                Button::make('reset'),
-                Button::make('reload')
-            ]);
+            ->responsive(false);
     }
 
     public function getColumns(): array
