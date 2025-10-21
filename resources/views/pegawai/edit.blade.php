@@ -23,9 +23,9 @@
                     </li>
                 </ul>
 
-                <form method="POST" action="{{ route('pegawai.update', $pegawai->id) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ auth()->user()->role === 'pegawai' ? route('pegawai.myBiodataUpdate') : route('pegawai.update', $pegawai->id) }}" enctype="multipart/form-data">
                     @csrf
-                    @method('PUT')
+                    @method('PATCH')
                     <div class="tab-content" id="myTabContent">
                         {{-- Data Diri Pegawai Tab --}}
                         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -285,7 +285,7 @@
                         </div>
                         
                         <button type="submit" class="btn btn-primary me-2">Update Data</button>
-                        <a href="{{ route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
+                                                <a href="{{ auth()->user()->role === 'pegawai' ? route('dashboard.index') : route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
                     </div>
                 </form>
             </div>

@@ -27,9 +27,15 @@ Route::get('/villages', [DependentDropdownController::class, 'villages'])->name(
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
-    Route::resource('pegawai', PegawaiController::class);
-    Route::post('/pegawai/{pegawai}/create-account', [PegawaiController::class, 'createAccount'])->name('pegawai.createAccount');
-    Route::get('/pegawai/{id}/pdf', [PegawaiController::class, 'generatePDF'])->name('pegawai.pdf');
+    Route::middleware(['superadmin'])->group(function () {
+        Route::resource('pegawai', PegawaiController::class);
+        Route::post('/pegawai/{pegawai}/create-account', [PegawaiController::class, 'createAccount'])->name('pegawai.createAccount');
+        Route::get('/pegawai/{id}/pdf', [PegawaiController::class, 'generatePDF'])->name('pegawai.pdf');
+    });
+
+    Route::get('/my-biodata', [PegawaiController::class, 'myBiodataEdit'])->name('pegawai.myBiodataEdit');
+    Route::patch('/my-biodata', [PegawaiController::class, 'myBiodataUpdate'])->name('pegawai.myBiodataUpdate');
+    Route::post('/my-biodata', [PegawaiController::class, 'myBiodataStore'])->name('pegawai.myBiodataStore');
 
     // Master Jabatan
     Route::get('jabatan/trash', [\App\Http\Controllers\JabatanController::class, 'trash'])->name('jabatan.trash');

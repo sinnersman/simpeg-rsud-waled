@@ -8,6 +8,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Indonesia;
@@ -214,7 +215,9 @@ class PegawaiController extends Controller
             $validatedData['foto_pegawai'] = $path;
         }
 
-        $pegawai->update($validatedData);
+        // Log::info('Updating Pegawai. Data to be updated:', $validatedData);
+        $pegawai->fill($validatedData);
+        $pegawai->save();
 
         return redirect()->route('pegawai.index')->with('success', 'Data Pegawai berhasil diperbarui!');
     }
@@ -263,5 +266,171 @@ class PegawaiController extends Controller
             'message' => 'Akun berhasil dibuat.',
             'password' => $password,
         ]);
+    }
+
+    public function myBiodataEdit()
+    {
+        $pegawai = Pegawai::where('nip', auth()->user()->username)->first();
+
+        if (!$pegawai) {
+            // If biodata doesn't exist, show the creation form
+            $title = 'Lengkapi Biodata Saya';
+            $breadcrumbs = [
+                ['name' => 'Dashboard', 'url' => route('dashboard.index')],
+                ['name' => 'Lengkapi Biodata', 'active' => true],
+            ];
+            // Pass an empty Pegawai object to the create view
+            return view('pegawai.create', compact('title', 'breadcrumbs'));
+        }
+
+        // If biodata exists, show the edit form
+        $title = 'Edit Biodata Saya';
+        $breadcrumbs = [
+            ['name' => 'Dashboard', 'url' => route('dashboard.index')],
+            ['name' => 'Biodata Saya', 'active', true],
+        ];
+
+        return view('pegawai.edit', compact('pegawai', 'title', 'breadcrumbs'));
+    }
+
+    public function myBiodataUpdate(Request $request)
+    {
+        $pegawai = Pegawai::where('nip', auth()->user()->username)->firstOrFail();
+
+        $validatedData = $request->validate([
+            'foto_pegawai' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'nip' => 'required|string|unique:pegawai,nip,'.$pegawai->id.'|max:255',
+            'nip_lama' => 'nullable|string|max:255',
+            'nama_lengkap' => 'required|string|max:255',
+            'nama_panggilan' => 'nullable|string|max:255',
+            'gelar_depan' => 'nullable|string|max:255',
+            'gelar_belakang' => 'nullable|string|max:255',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => 'nullable|string|max:255',
+            'agama' => 'nullable|string|max:255',
+            'golongan_darah' => 'nullable|string|max:255',
+            'status_perkawinan' => 'nullable|string|max:255',
+            'pendidikan_terakhir' => 'nullable|string|max:255',
+            'status_kepegawaian' => 'nullable|string|max:255',
+            'suku' => 'nullable|string|max:255',
+            'alamat_lengkap' => 'nullable|string',
+            'kode_pos' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:pegawai,email,'.$pegawai->id.'|max:255',
+            'fax' => 'nullable|string|max:255',
+            'telephone' => 'nullable|string|max:255',
+            'handphone' => 'nullable|string|max:255',
+            'rt' => 'nullable|string|max:255',
+            'rw' => 'nullable|string|max:255',
+            'provinsi' => 'nullable|string|max:255',
+            'kabupaten' => 'nullable|string|max:255',
+            'kecamatan' => 'nullable|string|max:255',
+            'kelurahan' => 'nullable|string|max:255',
+            'kebangsaan' => 'nullable|string|max:255',
+            'berat_badan' => 'nullable|integer',
+            'tinggi_badan' => 'nullable|integer',
+            'no_karpeg' => 'nullable|string|max:255',
+            'no_askes_bpjs' => 'nullable|string|max:255',
+            'no_taspen' => 'nullable|string|max:255',
+            'no_karis_karsu' => 'nullable|string|max:255',
+            'no_npwp' => 'nullable|string|max:255',
+            'no_korpri' => 'nullable|string|max:255',
+        ]);
+
+        // Convert IDs to names before saving
+        if ($request->provinsi) {
+            $validatedData['provinsi'] = Indonesia::findProvince($request->provinsi)->name;
+        }
+        if ($request->kabupaten) {
+            $validatedData['kabupaten'] = Indonesia::findCity($request->kabupaten)->name;
+        }
+        if ($request->kecamatan) {
+            $validatedData['kecamatan'] = Indonesia::findDistrict($request->kecamatan)->name;
+        }
+        if ($request->kelurahan) {
+            $validatedData['kelurahan'] = Indonesia::findVillage($request->kelurahan)->name;
+        }
+
+        if ($request->hasFile('foto_pegawai')) {
+            // Delete old photo if exists
+            if ($pegawai->foto_pegawai) {
+                Storage::delete(str_replace('/storage', 'public', $pegawai->foto_pegawai));
+            }
+            $path = $request->file('foto_pegawai')->store('public/foto_pegawai');
+            $validatedData['foto_pegawai'] = $path;
+        }
+
+        $pegawai->update($validatedData);
+
+        return redirect()->route('pegawai.myBiodataEdit')->with('success', 'Biodata berhasil diperbarui!');
+    }
+
+    public function myBiodataStore(Request $request)
+    {
+        $validatedData = $request->validate([
+            'foto_pegawai' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'nip' => 'required|string|unique:pegawai,nip|max:255',
+            'nip_lama' => 'nullable|string|max:255',
+            'nama_lengkap' => 'required|string|max:255',
+            'nama_panggilan' => 'nullable|string|max:255',
+            'gelar_depan' => 'nullable|string|max:255',
+            'gelar_belakang' => 'nullable|string|max:255',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => 'nullable|string|max:255',
+            'agama' => 'nullable|string|max:255',
+            'golongan_darah' => 'nullable|string|max:255',
+            'status_perkawinan' => 'nullable|string|max:255',
+            'pendidikan_terakhir' => 'nullable|string|max:255',
+            'status_kepegawaian' => 'nullable|string|max:255',
+            'suku' => 'nullable|string|max:255',
+            'alamat_lengkap' => 'nullable|string',
+            'kode_pos' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:pegawai,email|max:255',
+            'fax' => 'nullable|string|max:255',
+            'telephone' => 'nullable|string|max:255',
+            'handphone' => 'nullable|string|max:255',
+            'rt' => 'nullable|string|max:255',
+            'rw' => 'nullable|string|max:255',
+            'provinsi' => 'nullable|string|max:255',
+            'kabupaten' => 'nullable|string|max:255',
+            'kecamatan' => 'nullable|string|max:255',
+            'kelurahan' => 'nullable|string|max:255',
+            'kebangsaan' => 'nullable|string|max:255',
+            'berat_badan' => 'nullable|integer',
+            'tinggi_badan' => 'nullable|integer',
+            'no_karpeg' => 'nullable|string|max:255',
+            'no_askes_bpjs' => 'nullable|string|max:2uniquetoken',
+            'no_taspen' => 'nullable|string|max:255',
+            'no_karis_karsu' => 'nullable|string|max:255',
+            'no_npwp' => 'nullable|string|max:255',
+            'no_korpri' => 'nullable|string|max:255',
+        ]);
+
+        // Convert IDs to names before saving
+        if ($request->provinsi) {
+            $validatedData['provinsi'] = Indonesia::findProvince($request->provinsi)->name;
+        }
+        if ($request->kabupaten) {
+            $validatedData['kabupaten'] = Indonesia::findCity($request->kabupaten)->name;
+        }
+        if ($request->kecamatan) {
+            $validatedData['kecamatan'] = Indonesia::findDistrict($request->kecamatan)->name;
+        }
+        if ($request->kelurahan) {
+            $validatedData['kelurahan'] = Indonesia::findVillage($request->kelurahan)->name;
+        }
+
+        if ($request->hasFile('foto_pegawai')) {
+            $path = $request->file('foto_pegawai')->store('public/foto_pegawai');
+            $validatedData['foto_pegawai'] = $path;
+        }
+
+        // Associate with the logged-in user
+        $validatedData['user_id'] = auth()->id();
+
+        Pegawai::create($validatedData);
+
+        return redirect()->route('pegawai.myBiodataEdit')->with('success', 'Biodata berhasil disimpan!');
     }
 }

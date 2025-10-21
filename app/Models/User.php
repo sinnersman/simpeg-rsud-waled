@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Pegawai;
 
 class User extends Authenticatable
 {
@@ -25,6 +26,11 @@ class User extends Authenticatable
         'password',
         'is_active',
     ];
+
+    public function pegawai()
+    {
+        return $this->hasOne(Pegawai::class, 'nip', 'username');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

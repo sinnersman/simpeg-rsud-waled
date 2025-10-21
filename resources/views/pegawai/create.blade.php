@@ -9,7 +9,7 @@
                 <p class="text-muted mb-3">Isi semua kolom yang diperlukan untuk menambahkan data pegawai baru.</p>
                 
                 <div class="table-responsive">
-                    <form method="POST" action="{{ route('pegawai.store') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ auth()->user()->role === 'pegawai' ? route('pegawai.myBiodataStore') : route('pegawai.store') }}" enctype="multipart/form-data">
                         @csrf
                         {{-- Tab Navigation --}}
                         <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
@@ -41,7 +41,7 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="nip" class="form-label">*NIP</label>
-                                        <input type="text" class="form-control" id="nip" name="nip" required>
+                                        <input type="text" class="form-control" id="nip" name="nip" value="{{ auth()->user()->role === 'pegawai' ? auth()->user()->username : '' }}" {{ auth()->user()->role === 'pegawai' ? 'readonly' : '' }} required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="nip_lama" class="form-label">NIP Lama</label>
@@ -278,7 +278,7 @@
                         </div>
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary me-2">Simpan Data</button>
-                            <a href="{{ route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
+                            <a href="{{ auth()->user()->role === 'pegawai' ? route('dashboard.index') : route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
                 </div>

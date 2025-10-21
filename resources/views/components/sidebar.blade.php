@@ -19,6 +19,15 @@
                         <span class="link-title">Dashboard</span>
                     </a>
                 </li>
+                @if(Auth::user()->role === 'pegawai')
+                <li class="nav-item">
+                    <a href="{{ route('pegawai.myBiodataEdit') }}" class="nav-link">
+                        <i class="link-icon" data-lucide="user"></i>
+                        <span class="link-title">Biodata</span>
+                    </a>
+                </li>
+                @endif
+                @if(Auth::user()->role === 'superadmin')
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#ePersonal" role="button" aria-expanded="false" aria-controls="ePersonal">
                         <i class="link-icon" data-lucide="users"></i>
@@ -77,6 +86,7 @@
                         </ul>
                     </div>
                 </li>
+                @endif
             </ul>
         </div>
     </nav>
