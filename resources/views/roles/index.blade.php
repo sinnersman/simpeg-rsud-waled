@@ -17,6 +17,35 @@
                 <p class="text-muted mb-3">Berikut adalah daftar semua data role yang terdaftar.</p>
                 <div class="text-end mb-3">
                     <a href="{{ route('roles.create') }}" class="btn btn-primary">Tambah Role</a>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+                        Import Excel
+                    </button>
+                    <a href="{{ route('roles.downloadTemplate') }}" class="btn btn-info">Download Template</a>
+                </div>
+
+                <!-- Import Excel Modal -->
+                <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="importExcelModalLabel">Import Role from Excel</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('roles.import') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="file" class="form-label">Choose Excel File</label>
+                                        <input class="form-control" type="file" id="file" name="file" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Import</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="table-responsive">

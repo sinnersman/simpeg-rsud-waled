@@ -43,15 +43,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('induk_unit_kerja/trash', [\App\Http\Controllers\IndukUnitKerjaController::class, 'trash'])->name('induk_unit_kerja.trash');
     Route::get('induk_unit_kerja/{id}/restore', [\App\Http\Controllers\IndukUnitKerjaController::class, 'restore'])->name('induk_unit_kerja.restore');
     Route::delete('induk_unit_kerja/{id}/force-delete', [\App\Http\Controllers\IndukUnitKerjaController::class, 'forceDelete'])->name('induk_unit_kerja.forceDelete');
+    Route::post('induk_unit_kerja/import', [\App\Http\Controllers\IndukUnitKerjaController::class, 'import'])->name('induk_unit_kerja.import');
+    Route::get('induk_unit_kerja/download-template', [\App\Http\Controllers\IndukUnitKerjaController::class, 'downloadTemplate'])->name('induk_unit_kerja.downloadTemplate');
     Route::resource('induk_unit_kerja', \App\Http\Controllers\IndukUnitKerjaController::class)->except(['show']);
 
     // Master Unit Kerja
     Route::get('unit_kerja/trash', [\App\Http\Controllers\UnitKerjaController::class, 'trash'])->name('unit_kerja.trash');
     Route::get('unit_kerja/{id}/restore', [\App\Http\Controllers\UnitKerjaController::class, 'restore'])->name('unit_kerja.restore');
     Route::delete('unit_kerja/{id}/force-delete', [\App\Http\Controllers\UnitKerjaController::class, 'forceDelete'])->name('unit_kerja.forceDelete');
+    Route::post('unit_kerja/import', [\App\Http\Controllers\UnitKerjaController::class, 'import'])->name('unit_kerja.import');
+    Route::get('unit_kerja/download-template', [\App\Http\Controllers\UnitKerjaController::class, 'downloadTemplate'])->name('unit_kerja.downloadTemplate');
     Route::resource('unit_kerja', \App\Http\Controllers\UnitKerjaController::class)->except(['show']);
 
     // Master Role
+    Route::post('roles/import', [\App\Http\Controllers\RoleController::class, 'import'])->name('roles.import');
+    Route::get('roles/download-template', [\App\Http\Controllers\RoleController::class, 'downloadTemplate'])->name('roles.downloadTemplate');
     Route::resource('roles', RoleController::class)->except(['show']);
 
     // User Management

@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\DataTables\RoleDataTable;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\RoleImport;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class RoleController extends Controller
 {
@@ -93,5 +97,31 @@ class RoleController extends Controller
 
         return redirect()->route('roles.index')
             ->with('success', 'Role berhasil dihapus.');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        Excel::import(new RoleImport, $request->file('file'));
+
+        return redirect()->route('roles.index')->with('success', 'Role imported successfully');
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'name');
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template_role.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        $writer->save('php://output');
+        exit;
     }
 }

@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\DataTables\IndukUnitKerjaDataTable;
 use App\Models\IndukUnitKerja;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\IndukUnitKerjaImport;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class IndukUnitKerjaController extends Controller
 {
@@ -141,5 +145,32 @@ class IndukUnitKerjaController extends Controller
 
         return redirect()->route('induk_unit_kerja.trash')
             ->with('success', 'Induk Unit Kerja permanently deleted successfully');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        Excel::import(new IndukUnitKerjaImport, $request->file('file'));
+
+        return redirect()->route('induk_unit_kerja.index')->with('success', 'Induk Unit Kerja imported successfully');
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'kode');
+        $sheet->setCellValue('B1', 'nama_induk_unit_kerja');
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template_induk_unit_kerja.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        $writer->save('php://output');
+        exit;
     }
 }

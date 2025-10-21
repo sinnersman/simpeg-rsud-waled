@@ -6,6 +6,10 @@ use App\DataTables\UnitKerjaDataTable;
 use App\Models\IndukUnitKerja;
 use App\Models\UnitKerja;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UnitKerjaImport;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class UnitKerjaController extends Controller
 {
@@ -33,7 +37,7 @@ class UnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Unit Kerja', 'url' => route('unit_kerja.index')],
-            ['name' => 'Tambah Unit Kerja', 'active' => true],
+            ['name' => 'Tambah Unit Kerja', 'active', true],
         ];
 
         return view('unit_kerja.create', compact('indukUnitKerjas', 'title', 'breadcrumbs'));
@@ -50,7 +54,7 @@ class UnitKerjaController extends Controller
             'nama_unit_kerja' => 'required|string|max:255',
         ]);
 
-        UnitKerja::create($request->all());
+        UnitKerja::create($request->validated());
 
         return redirect()->route('unit_kerja.index')
             ->with('success', 'Unit Kerja created successfully.');
@@ -118,7 +122,7 @@ class UnitKerjaController extends Controller
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ['name' => 'Master Unit Kerja', 'url' => route('unit_kerja.index')],
-            ['name' => 'Recycle Bin Unit Kerja', 'active' => true],
+            ['name' => 'Recycle Bin Unit Kerja', 'active', true],
         ];
 
         return view('unit_kerja.trash', compact('unitKerjas', 'title', 'breadcrumbs'));
@@ -146,5 +150,33 @@ class UnitKerjaController extends Controller
 
         return redirect()->route('unit_kerja.trash')
             ->with('success', 'Unit Kerja permanently deleted successfully');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        Excel::import(new UnitKerjaImport, $request->file('file'));
+
+        return redirect()->route('unit_kerja.index')->with('success', 'Unit Kerja imported successfully');
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'induk_unit_kerja_id');
+        $sheet->setCellValue('B1', 'kode');
+        $sheet->setCellValue('C1', 'nama_unit_kerja');
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template_unit_kerja.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        $writer->save('php://output');
+        exit;
     }
 }
