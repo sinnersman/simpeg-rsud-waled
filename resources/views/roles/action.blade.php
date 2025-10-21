@@ -1,6 +1,6 @@
 <div class="d-grid gap-1">
-    <a class="btn btn-primary btn-sm" href="{{ route('jabatan.edit', $jabatan->id) }}">Edit</a>
-    <form action="{{ route('jabatan.destroy', $jabatan->id) }}" method="POST">
+    <a class="btn btn-primary btn-sm" href="{{ route('roles.edit', $role->id) }}">Edit</a>
+    <form action="{{ route('roles.destroy', $role->id) }}" method="POST">
         @csrf
         @method('DELETE')
         <button type="submit" class="btn btn-danger btn-sm w-100" onclick="event.preventDefault(); Swal.fire({

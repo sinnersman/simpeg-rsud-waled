@@ -1,6 +1,7 @@
 <div class="d-grid gap-1">
-    <a class="btn btn-primary btn-sm" href="{{ route('jabatan.edit', $jabatan->id) }}">Edit</a>
-    <form action="{{ route('jabatan.destroy', $jabatan->id) }}" method="POST">
+    <a class="btn btn-info btn-sm" href="{{ route('pegawai.show', $pegawai->id) }}">Detail</a>
+    <a class="btn btn-primary btn-sm" href="{{ route('pegawai.edit', $pegawai->id) }}">Edit</a>
+    <form action="{{ route('pegawai.destroy', $pegawai->id) }}" method="POST">
         @csrf
         @method('DELETE')
         <button type="submit" class="btn btn-danger btn-sm w-100" onclick="event.preventDefault(); Swal.fire({
@@ -14,6 +15,6 @@
         if (result.isConfirmed) {
             event.target.form.submit();
         }
-    });">Delete</button>
+    });">Hapus</button>
     </form>
 </div>

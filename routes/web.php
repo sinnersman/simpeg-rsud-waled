@@ -3,6 +3,8 @@
 use App\Http\Controllers\DependentDropdownController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +48,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('unit_kerja/{id}/restore', [\App\Http\Controllers\UnitKerjaController::class, 'restore'])->name('unit_kerja.restore');
     Route::delete('unit_kerja/{id}/force-delete', [\App\Http\Controllers\UnitKerjaController::class, 'forceDelete'])->name('unit_kerja.forceDelete');
     Route::resource('unit_kerja', \App\Http\Controllers\UnitKerjaController::class)->except(['show']);
+
+    // Master Role
+    Route::resource('roles', RoleController::class)->except(['show']);
+
+    // User Management
+    Route::resource('users', UserController::class);
+    Route::patch('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+    Route::patch('users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 
     Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

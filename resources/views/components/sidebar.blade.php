@@ -46,7 +46,7 @@
                     <div class="collapse" data-bs-parent="#sidebarNav" id="manajemenAkun">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
-                                <a href="pages/advanced-ui/cropper.html" class="nav-link">List Pengguna</a>
+                                <a href="{{ route('users.index') }}" class="nav-link">List Pengguna</a>
                             </li>
                             <li class="nav-item">
                                 <a href="pages/advanced-ui/owl-carousel.html" class="nav-link">Hak Akses</a>
@@ -70,6 +70,9 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('induk_unit_kerja.index') }}" class="nav-link">Data Induk Unit Kerja</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('roles.index') }}" class="nav-link">Master Role</a>
                             </li>
                         </ul>
                     </div>
