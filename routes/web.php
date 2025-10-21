@@ -31,6 +31,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('pegawai', PegawaiController::class);
         Route::post('/pegawai/{pegawai}/create-account', [PegawaiController::class, 'createAccount'])->name('pegawai.createAccount');
         Route::get('/pegawai/{id}/pdf', [PegawaiController::class, 'generatePDF'])->name('pegawai.pdf');
+
+        // Admin Approvals
+        Route::get('/admin/approvals', [\App\Http\Controllers\AdminApprovalController::class, 'index'])->name('admin.approvals.index');
+        Route::patch('/admin/approvals/{changeRequest}/approve', [\App\Http\Controllers\AdminApprovalController::class, 'approve'])->name('admin.approvals.approve');
+        Route::patch('/admin/approvals/{changeRequest}/reject', [\App\Http\Controllers\AdminApprovalController::class, 'reject'])->name('admin.approvals.reject');
     });
 
     Route::get('/my-biodata', [PegawaiController::class, 'myBiodataEdit'])->name('pegawai.myBiodataEdit');

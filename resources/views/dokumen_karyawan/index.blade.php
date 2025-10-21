@@ -36,8 +36,6 @@
     </div>
 </div>
 @endsection
-
-
 @push('styles')
 <link rel="stylesheet" href="{{ asset('/') }}assets/vendors/datatables.net-bs5/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">

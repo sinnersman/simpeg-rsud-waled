@@ -53,6 +53,12 @@
                 </li>
                 <li class="nav-item nav-category">Pengaturan</li>
                 <li class="nav-item">
+                    <a href="{{ route('admin.approvals.index') }}" class="nav-link">
+                        <i class="link-icon" data-lucide="check-square"></i>
+                        <span class="link-title">Persetujuan Admin</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#manajemenAkun" role="button" aria-expanded="false" aria-controls="manajemenAkun">
                         <i class="link-icon" data-lucide="users"></i>
                         <span class="link-title">Manajemen Akun</span>

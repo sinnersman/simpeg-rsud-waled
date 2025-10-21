@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DataTables\PegawaiDataTable;
 use App\Models\Pegawai;
+use App\Models\PegawaiChangeRequest;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -337,32 +338,70 @@ class PegawaiController extends Controller
             'no_korpri' => 'nullable|string|max:255',
         ]);
 
-        // Convert IDs to names before saving
-        if ($request->provinsi) {
-            $validatedData['provinsi'] = Indonesia::findProvince($request->provinsi)->name;
-        }
-        if ($request->kabupaten) {
-            $validatedData['kabupaten'] = Indonesia::findCity($request->kabupaten)->name;
-        }
-        if ($request->kecamatan) {
-            $validatedData['kecamatan'] = Indonesia::findDistrict($request->kecamatan)->name;
-        }
-        if ($request->kelurahan) {
-            $validatedData['kelurahan'] = Indonesia::findVillage($request->kelurahan)->name;
-        }
-
+        // Handle file upload separately as it's not a direct field update
+        $newFotoPegawaiPath = null;
         if ($request->hasFile('foto_pegawai')) {
-            // Delete old photo if exists
-            if ($pegawai->foto_pegawai) {
-                Storage::delete(str_replace('/storage', 'public', $pegawai->foto_pegawai));
-            }
-            $path = $request->file('foto_pegawai')->store('public/foto_pegawai');
-            $validatedData['foto_pegawai'] = $path;
+            $newFotoPegawaiPath = $request->file('foto_pegawai')->store('public/foto_pegawai');
         }
 
-        $pegawai->update($validatedData);
+        $changesRequested = false;
+        foreach ($validatedData as $field => $newValue) {
+            $oldValue = $pegawai->$field;
 
-        return redirect()->route('pegawai.myBiodataEdit')->with('success', 'Biodata berhasil diperbarui!');
+            // Special handling for foto_pegawai
+            if ($field === 'foto_pegawai') {
+                if ($newFotoPegawaiPath && $newFotoPegawaiPath !== $oldValue) {
+                    PegawaiChangeRequest::create([
+                        'pegawai_id' => $pegawai->id,
+                        'field_name' => $field,
+                        'old_value' => $oldValue,
+                        'new_value' => $newFotoPegawaiPath,
+                        'requested_by_user_id' => auth()->id(),
+                        'status' => 'pending',
+                    ]);
+                    $changesRequested = true;
+                }
+            } else {
+                // Normalize empty strings, null, and 0 to null for nullable fields before comparison
+                $normalizedNewValue = ($newValue === '' || $newValue === null || $newValue === 0) ? null : (string)$newValue;
+                $normalizedOldValue = ($oldValue === '' || $oldValue === null || $oldValue === 0) ? null : (string)$oldValue;
+
+                if ($normalizedNewValue !== $normalizedOldValue) {
+                    // Convert IDs to names for display in change request
+                    if (in_array($field, ['provinsi', 'kabupaten', 'kecamatan', 'kelurahan'])) {
+                        $oldValueDisplay = $pegawai->$field; // Use current value for old_value display
+                        if ($field === 'provinsi') $newValue = Indonesia::findProvince($newValue)->name;
+                        if ($field === 'kabupaten') $newValue = Indonesia::findCity($newValue)->name;
+                        if ($field === 'kecamatan') $newValue = Indonesia::findDistrict($newValue)->name;
+                        if ($field === 'kelurahan') $newValue = Indonesia::findVillage($newValue)->name;
+                        $oldValue = $oldValueDisplay; // Reassign old value for storage
+                    }
+
+                    Log::info('PegawaiChangeRequest created for field:', [
+                        'field' => $field,
+                        'oldValue' => $oldValue,
+                        'newValue' => $newValue,
+                        'normalizedOldValue' => $normalizedOldValue,
+                        'normalizedNewValue' => $normalizedNewValue,
+                    ]);
+                    PegawaiChangeRequest::create([
+                        'pegawai_id' => $pegawai->id,
+                        'field_name' => $field,
+                        'old_value' => $oldValue,
+                        'new_value' => $newValue,
+                        'requested_by_user_id' => auth()->id(),
+                        'status' => 'pending',
+                    ]);
+                    $changesRequested = true;
+                }
+            }
+        }
+
+        if ($changesRequested) {
+            return redirect()->route('pegawai.myBiodataEdit')->with('success', 'Perubahan Anda telah diajukan dan menunggu persetujuan admin.');
+        } else {
+            return redirect()->route('pegawai.myBiodataEdit')->with('info', 'Tidak ada perubahan yang diajukan.');
+        }
     }
 
     public function myBiodataStore(Request $request)
