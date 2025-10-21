@@ -26,6 +26,12 @@
                         <span class="link-title">Biodata</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('dokumen-karyawan.index') }}" class="nav-link">
+                        <i class="link-icon" data-lucide="file-text"></i>
+                        <span class="link-title">Dokumen Saya</span>
+                    </a>
+                </li>
                 @endif
                 @if(Auth::user()->role === 'superadmin')
                 <li class="nav-item">
@@ -40,7 +46,7 @@
                                 <a href="{{ route('pegawai.index') }}" class="nav-link">Data Pegawai</a>
                             </li>
                             <li class="nav-item">
-                                <a href="pages/advanced-ui/owl-carousel.html" class="nav-link">Dokumen Karyawan</a>
+                                <a href="{{ route('dokumen-karyawan.index') }}" class="nav-link">Dokumen Karyawan</a>
                             </li>
                         </ul>
                     </div>

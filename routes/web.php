@@ -37,6 +37,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/my-biodata', [PegawaiController::class, 'myBiodataUpdate'])->name('pegawai.myBiodataUpdate');
     Route::post('/my-biodata', [PegawaiController::class, 'myBiodataStore'])->name('pegawai.myBiodataStore');
 
+    // Dokumen Karyawan
+    Route::resource('dokumen-karyawan', \App\Http\Controllers\DokumenKaryawanController::class);
+
     // Master Jabatan
     Route::get('jabatan/trash', [\App\Http\Controllers\JabatanController::class, 'trash'])->name('jabatan.trash');
     Route::get('jabatan/{id}/restore', [\App\Http\Controllers\JabatanController::class, 'restore'])->name('jabatan.restore');
