@@ -80,6 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
     Route::patch('users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 
+    // E-Jabatan
+    Route::resource('e-jabatan', \App\Http\Controllers\EJabatanController::class);
+
     Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

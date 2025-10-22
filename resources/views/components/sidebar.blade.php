@@ -48,6 +48,9 @@
                             <li class="nav-item">
                                 <a href="{{ route('dokumen-karyawan.index') }}" class="nav-link">Dokumen Karyawan</a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('e-jabatan.index') }}" class="nav-link">Riwayat Jabatan</a>
+                            </li>
                         </ul>
                     </div>
                 </li>

@@ -50,4 +50,9 @@ class Pegawai extends Model
         'no_npwp',
         'no_korpri',
     ];
+
+    public function riwayatJabatan()
+    {
+        return $this->hasMany(RiwayatJabatan::class);
+    }
 }
