@@ -13,6 +13,7 @@ class UnitKerja extends Model
 
     protected $fillable = [
         'induk_unit_kerja_id',
+        'parent_id', // Add parent_id to fillable
         'kode',
         'nama_unit_kerja',
     ];
@@ -20,5 +21,17 @@ class UnitKerja extends Model
     public function indukUnitKerja()
     {
         return $this->belongsTo(IndukUnitKerja::class);
+    }
+
+    // Self-referencing relationship for parent
+    public function parent()
+    {
+        return $this->belongsTo(UnitKerja::class, 'parent_id');
+    }
+
+    // Self-referencing relationship for children
+    public function children()
+    {
+        return $this->hasMany(UnitKerja::class, 'parent_id');
     }
 }

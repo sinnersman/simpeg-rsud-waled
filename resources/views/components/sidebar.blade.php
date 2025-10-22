@@ -32,12 +32,6 @@
                         <span class="link-title">Dokumen Saya</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('pegawai.myBiodataEdit') }}#history" class="nav-link">
-                        <i class="link-icon" data-lucide="clock-history"></i> {{-- Using a clock-history icon for history --}}
-                        <span class="link-title">Riwayat Pengajuan Perubahan</span>
-                    </a>
-                </li>
                 @endif
                 @if(Auth::user()->role === 'superadmin')
                 <li class="nav-item">
