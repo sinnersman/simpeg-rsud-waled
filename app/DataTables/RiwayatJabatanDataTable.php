@@ -14,6 +14,8 @@ use Yajra\DataTables\Services\DataTable;
 
 class RiwayatJabatanDataTable extends DataTable
 {
+    public $pegawaiId;
+
     /**
      * Build the DataTable class.
      *
@@ -61,7 +63,13 @@ class RiwayatJabatanDataTable extends DataTable
      */
     public function query(RiwayatJabatan $model): QueryBuilder
     {
-        return $model->newQuery()->with(['pegawai', 'jabatan', 'unitKerja', 'indukUnitKerja']);
+        $query = $model->newQuery()->with(['pegawai', 'jabatan', 'unitKerja', 'indukUnitKerja']);
+
+        if ($this->pegawaiId) {
+            $query->where('pegawai_id', $this->pegawaiId);
+        }
+
+        return $query;
     }
 
     /**

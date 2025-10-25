@@ -22,7 +22,7 @@ class PegawaiDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('foto', function (Pegawai $pegawai) {
-                $url = $pegawai->foto_pegawai ? asset($pegawai->foto_pegawai) : asset('path/to/default/avatar.png');
+                $url = $pegawai->foto_pegawai ? asset($pegawai->foto_pegawai) : asset('assets/images/user/default.png');
 
                 return '<img src="'.$url.'" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">';
             })

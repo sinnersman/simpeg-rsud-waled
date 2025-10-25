@@ -18,6 +18,10 @@ use Laravolt\Indonesia\Models\Province;
 use Laravolt\Indonesia\Models\City;
 use Laravolt\Indonesia\Models\District;
 use Laravolt\Indonesia\Models\Village;
+use App\DataTables\RiwayatJabatanDataTable;
+use App\Models\Jabatan;
+use App\Models\UnitKerja;
+use App\Models\IndukUnitKerja;
 
 class PegawaiController extends Controller
 {
@@ -122,9 +126,8 @@ class PegawaiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Pegawai $pegawai, RiwayatJabatanDataTable $dataTable)
     {
-        $pegawai = Pegawai::findOrFail($id);
         $title = 'Detail Pegawai';
         $breadcrumbs = [
             ['name' => 'Dashboard', 'url' => route('dashboard.index')],
@@ -132,7 +135,13 @@ class PegawaiController extends Controller
             ['name' => 'Detail Pegawai', 'active' => true],
         ];
 
-        return view('pegawai.show', compact('pegawai', 'title', 'breadcrumbs'));
+        $dataTable->pegawaiId = $pegawai->id; // Pass pegawaiId to the DataTable
+
+        $jabatans = \App\Models\Jabatan::all();
+        $unitKerja = \App\Models\UnitKerja::all();
+        $indukUnitKerja = \App\Models\IndukUnitKerja::all();
+
+        return $dataTable->render('pegawai.show', compact('pegawai', 'title', 'breadcrumbs', 'jabatans', 'unitKerja', 'indukUnitKerja'));
     }
 
     /**
