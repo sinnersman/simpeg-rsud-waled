@@ -2,32 +2,26 @@
 
 namespace App\DataTables;
 
-use App\Models\Jabatan;
+use App\Models\JenisJabatan;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class JabatanDataTable extends DataTable
+class JenisJabatanDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
      *
-     * @param  QueryBuilder<Jabatan>  $query  Results from query() method.
+     * @param  QueryBuilder<JenisJabatan>  $query  Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            ->addColumn('jenis_jabatan_nama', function ($jabatan) {
-                return $jabatan->jenisJabatan->nama ?? '-';
-            })
-            ->addColumn('jenjang_nama', function ($jabatan) {
-                return $jabatan->jenjang->nama ?? '-';
-            })
-            ->addColumn('action', function ($jabatan) {
-                return view('jabatan.action', compact('jabatan'));
+            ->addColumn('action', function ($jenisJabatan) {
+                return view('jenis_jabatan.action', compact('jenisJabatan'));
             })
             ->setRowId('id');
     }
@@ -35,11 +29,15 @@ class JabatanDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      *
-     * @return QueryBuilder<Jabatan>
+     * @return QueryBuilder<JenisJabatan>
      */
-    public function query(Jabatan $model): QueryBuilder
+    public function query(JenisJabatan $model): QueryBuilder
     {
-        return $model->newQuery()->with(['jenisJabatan', 'jenjang']);
+        $query = $model->newQuery();
+        if (request()->routeIs('jenis_jabatan.trash')) {
+            $query->onlyTrashed();
+        }
+        return $query;
     }
 
     /**
@@ -48,9 +46,9 @@ class JabatanDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('jabatan-table')
+            ->setTableId('jenisjabatan-table')
             ->columns($this->getColumns())
-            ->ajax(route('jabatan.index'))
+            ->ajax(route('jenis_jabatan.index'))
             ->orderBy(1)
             ->selectStyleSingle()
             ->responsive(false);
@@ -63,10 +61,8 @@ class JabatanDataTable extends DataTable
     {
         return [
             Column::make('DT_RowIndex')->title('No')->orderable(false)->searchable(false),
-            Column::make('kode_jabatan')->title('Kode Jabatan')->addClass('text-left'),
-            Column::make('nama_jabatan'),
-            Column::make('jenis_jabatan_nama')->title('Jenis Jabatan'),
-            Column::make('jenjang_nama')->title('Jenjang'),
+            Column::make('kode')->title('Kode')->addClass('text-left'),
+            Column::make('nama')->title('Nama Jenis Jabatan'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)
@@ -80,6 +76,6 @@ class JabatanDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Jabatan_'.date('YmdHis');
+        return 'JenisJabatan_'.date('YmdHis');
     }
 }

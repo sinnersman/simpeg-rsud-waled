@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\DataTables\JabatanDataTable;
 use App\Imports\JabatanImport;
 use App\Models\Jabatan;
+use App\Models\JenisJabatan;
+use App\Models\Jenjang;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,7 +33,9 @@ class JabatanController extends Controller
      */
     public function create()
     {
-        return view('jabatan.create');
+        $jenisJabatans = JenisJabatan::all();
+        $jenjangs = Jenjang::all();
+        return view('jabatan.create', compact('jenisJabatans', 'jenjangs'));
     }
 
     /**
@@ -40,8 +44,10 @@ class JabatanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_jabatan' => 'required|string|max:255',
+            'kode_jabatan' => 'required|string|max:255|unique:jabatans,kode_jabatan',
             'nama_jabatan' => 'required|string|max:255',
+            'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
+            'jenjang_id' => 'nullable|exists:jenjangs,id',
         ]);
 
         Jabatan::create($request->all());
@@ -55,7 +61,9 @@ class JabatanController extends Controller
      */
     public function edit(Jabatan $jabatan)
     {
-        return view('jabatan.edit', compact('jabatan'));
+        $jenisJabatans = JenisJabatan::all();
+        $jenjangs = Jenjang::all();
+        return view('jabatan.edit', compact('jabatan', 'jenisJabatans', 'jenjangs'));
     }
 
     /**
@@ -64,8 +72,10 @@ class JabatanController extends Controller
     public function update(Request $request, Jabatan $jabatan)
     {
         $request->validate([
-            'kode_jabatan' => 'required|string|max:255',
+            'kode_jabatan' => 'required|string|max:255|unique:jabatans,kode_jabatan,' . $jabatan->id,
             'nama_jabatan' => 'required|string|max:255',
+            'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
+            'jenjang_id' => 'nullable|exists:jenjangs,id',
         ]);
 
         $jabatan->update($request->all());
@@ -128,6 +138,8 @@ class JabatanController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'kode_jabatan');
         $sheet->setCellValue('B1', 'nama_jabatan');
+        $sheet->setCellValue('C1', 'jenis_jabatan_id');
+        $sheet->setCellValue('D1', 'jenjang_id');
 
         $writer = new Xlsx($spreadsheet);
         $fileName = 'template_jabatan.xlsx';

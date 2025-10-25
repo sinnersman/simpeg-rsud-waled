@@ -30,6 +30,24 @@
                         <label for="nama_jabatan" class="form-label">Nama Jabatan</label>
                         <input type="text" class="form-control" id="nama_jabatan" name="nama_jabatan" value="{{ $jabatan->nama_jabatan }}" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="jenis_jabatan_id" class="form-label">Jenis Jabatan</label>
+                        <select class="form-select" id="jenis_jabatan_id" name="jenis_jabatan_id">
+                            <option value="">Pilih Jenis Jabatan</option>
+                            @foreach ($jenisJabatans as $jenisJabatan)
+                                <option value="{{ $jenisJabatan->id }}" {{ $jabatan->jenis_jabatan_id == $jenisJabatan->id ? 'selected' : '' }}>{{ $jenisJabatan->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="jenjang_id" class="form-label">Jenjang</label>
+                        <select class="form-select" id="jenjang_id" name="jenjang_id">
+                            <option value="">Pilih Jenjang</option>
+                            @foreach ($jenjangs as $jenjang)
+                                <option value="{{ $jenjang->id }}" {{ $jabatan->jenjang_id == $jenjang->id ? 'selected' : '' }}>{{ $jenjang->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary me-2">Update Data</button>
                         <a href="{{ route('jabatan.index') }}" class="btn btn-secondary">Batal</a>

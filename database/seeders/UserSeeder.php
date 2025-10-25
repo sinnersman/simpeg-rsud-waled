@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin User',
             'username' => 'admin',
             'email' => 'admin@example.com',
-            'role' => 'admin',
+            'role' => 'superadmin',
             'password' => Hash::make('password'), // You should change this to a strong password in production
         ]);
 

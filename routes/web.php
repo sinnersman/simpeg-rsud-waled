@@ -53,6 +53,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('jabatan/import-excel', [\App\Http\Controllers\JabatanController::class, 'importExcel'])->name('jabatan.importExcel');
     Route::resource('jabatan', \App\Http\Controllers\JabatanController::class)->except(['show']);
 
+    // Master Jenis Jabatan
+    Route::get('jenis_jabatan/trash', [\App\Http\Controllers\JenisJabatanController::class, 'trash'])->name('jenis_jabatan.trash');
+    Route::get('jenis_jabatan/{id}/restore', [\App\Http\Controllers\JenisJabatanController::class, 'restore'])->name('jenis_jabatan.restore');
+    Route::delete('jenis_jabatan/{id}/force-delete', [\App\Http\Controllers\JenisJabatanController::class, 'forceDelete'])->name('jenis_jabatan.forceDelete');
+    Route::post('jenis_jabatan/import-excel', [\App\Http\Controllers\JenisJabatanController::class, 'importExcel'])->name('jenis_jabatan.importExcel');
+    Route::get('jenis_jabatan/download-template', [\App\Http\Controllers\JenisJabatanController::class, 'downloadTemplate'])->name('jenis_jabatan.downloadTemplate');
+    Route::resource('jenis_jabatan', \App\Http\Controllers\JenisJabatanController::class)->except(['show']);
+
+    // Master Jenjang
+    Route::get('jenjang/trash', [\App\Http\Controllers\JenjangController::class, 'trash'])->name('jenjang.trash');
+    Route::get('jenjang/{id}/restore', [\App\Http\Controllers\JenjangController::class, 'restore'])->name('jenjang.restore');
+    Route::delete('jenjang/{id}/force-delete', [\App\Http\Controllers\JenjangController::class, 'forceDelete'])->name('jenjang.forceDelete');
+    Route::post('jenjang/import-excel', [\App\Http\Controllers\JenjangController::class, 'importExcel'])->name('jenjang.importExcel');
+    Route::get('jenjang/download-template', [\App\Http\Controllers\JenjangController::class, 'downloadTemplate'])->name('jenjang.downloadTemplate');
+    Route::resource('jenjang', \App\Http\Controllers\JenjangController::class)->except(['show']);
+
     // Master Induk Unit Kerja
     Route::get('induk_unit_kerja/trash', [\App\Http\Controllers\IndukUnitKerjaController::class, 'trash'])->name('induk_unit_kerja.trash');
     Route::get('induk_unit_kerja/{id}/restore', [\App\Http\Controllers\IndukUnitKerjaController::class, 'restore'])->name('induk_unit_kerja.restore');

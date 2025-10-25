@@ -10,5 +10,15 @@ class Jabatan extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['kode_jabatan', 'nama_jabatan'];
+    protected $fillable = ['kode_jabatan', 'nama_jabatan', 'jenis_jabatan_id', 'jenjang_id'];
+
+    public function jenisJabatan()
+    {
+        return $this->belongsTo(JenisJabatan::class);
+    }
+
+    public function jenjang()
+    {
+        return $this->belongsTo(Jenjang::class);
+    }
 }
