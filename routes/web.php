@@ -29,6 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
     Route::get('organization-chart', [\App\Http\Controllers\DashboardController::class, 'organizationChart'])->name('organization.chart');
     Route::middleware(['superadmin'])->group(function () {
+        Route::get('pegawai/download-template', [PegawaiController::class, 'downloadTemplate'])->name('pegawai.downloadTemplate');
+        Route::post('pegawai/import-excel', [PegawaiController::class, 'importExcel'])->name('pegawai.importExcel');
         Route::resource('pegawai', PegawaiController::class);
         Route::post('/pegawai/{pegawai}/create-account', [PegawaiController::class, 'createAccount'])->name('pegawai.createAccount');
         Route::get('/pegawai/{id}/pdf', [PegawaiController::class, 'generatePDF'])->name('pegawai.pdf');

@@ -26,6 +26,10 @@ use App\Models\JenisJabatan;
 use App\Models\Jenjang;
 use App\Models\Golongan;
 use App\Models\RiwayatJabatan;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Imports\PegawaiImport;
 
 class PegawaiController extends Controller
 {
@@ -668,5 +672,91 @@ class PegawaiController extends Controller
         $riwayat_jabatan->delete(); // Soft delete
 
         return redirect()->route('pegawai.edit', $pegawai->id)->with('success', 'Riwayat jabatan berhasil dihapus!');
+    }
+
+    /**
+     * Download Excel template for Pegawai.
+     */
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet;
+
+        // Create the main data sheet
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Data Pegawai');
+        $fillable = (new Pegawai)->getFillable();
+        // remove foreign key ids and add name columns
+        $fillable = array_diff($fillable, ['jabatan_id', 'jenis_jabatan_id', 'jenjang_id', 'golongan_id', 'unit_kerja_id', 'induk_unit_kerja_id']);
+        $fillable[] = 'jabatan';
+        $fillable[] = 'jenis_jabatan';
+        $fillable[] = 'jenjang';
+        $fillable[] = 'golongan';
+        $fillable[] = 'unit_kerja';
+        $fillable[] = 'induk_unit_kerja';
+
+        $sheet->fromArray($fillable, null, 'A1');
+
+        // Create master data sheets and add data validation
+        $masters = [
+            'jabatan' => ['model' => Jabatan::class, 'name_column' => 'nama_jabatan', 'code_column' => 'kode_jabatan'],
+            'jenis_jabatan' => ['model' => JenisJabatan::class, 'name_column' => 'nama', 'code_column' => 'id'],
+            'jenjang' => ['model' => Jenjang::class, 'name_column' => 'nama', 'code_column' => 'id'],
+            'golongan' => ['model' => Golongan::class, 'name_column' => 'golongan', 'code_column' => 'id'],
+            'unit_kerja' => ['model' => UnitKerja::class, 'name_column' => 'nama_unit_kerja', 'code_column' => 'id'],
+            'induk_unit_kerja' => ['model' => IndukUnitKerja::class, 'name_column' => 'nama_induk_unit_kerja', 'code_column' => 'id'],
+        ];
+
+        foreach ($masters as $masterName => $masterData) {
+            $masterSheet = $spreadsheet->createSheet();
+            $masterSheet->setTitle($masterName);
+            $masterModel = new $masterData['model'];
+            $masterItems = $masterModel->all();
+            $masterSheet->fromArray([['id', $masterData['name_column'], 'code_and_name']], null, 'A1');
+            $masterItemsArray = [];
+            foreach ($masterItems as $item) {
+                $masterItemsArray[] = [$item->id, $item->{$masterData['name_column']}, $item->{$masterData['code_column']} . ' - ' . $item->{$masterData['name_column']}];
+            }
+            $masterSheet->fromArray($masterItemsArray, null, 'A2');
+
+            $colIndex = array_search($masterName, array_values($fillable));
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
+            for ($i = 2; $i <= 1000; $i++) {
+                $validation = $sheet->getCell($colLetter . $i)->getDataValidation();
+                $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+                $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+                $validation->setAllowBlank(false);
+                $validation->setShowInputMessage(true);
+                $validation->setShowErrorMessage(true);
+                $validation->setShowDropDown(true);
+                $validation->setErrorTitle('Input error');
+                $validation->setError('Value is not in list.');
+                $validation->setPromptTitle('Pick from list');
+                $validation->setPrompt('Please pick a value from the drop-down list.');
+                $validation->setFormula1($masterName.'!$C$2:$C$'.($masterItems->count() + 1));
+            }
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template_pegawai.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Import Excel data for Pegawai.
+     */
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new PegawaiImport, $request->file('excel_file'));
+
+        return redirect()->route('pegawai.index')
+            ->with('success', 'Data Pegawai berhasil diimpor.');
     }
 }

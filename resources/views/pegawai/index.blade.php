@@ -12,7 +12,15 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Daftar Data Pegawai</h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title">Daftar Data Pegawai</h4>
+                    <div>
+                        <a href="{{ route('pegawai.downloadTemplate') }}" class="btn btn-success">Download Template</a>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
+                            Import Excel
+                        </button>
+                    </div>
+                </div>
                 <p class="text-muted mb-3">Berikut adalah daftar semua data pegawai yang terdaftar.</p>
                 
                 <div class="table-responsive">
@@ -24,6 +32,31 @@
         </div>
     </div>
 </div>
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Data Pegawai</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('pegawai.importExcel') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="excel_file" class="form-label">Pilih file Excel</label>
+                        <input class="form-control" type="file" id="excel_file" name="excel_file" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 <!-- Create Account Modal -->
