@@ -17,8 +17,11 @@ class RiwayatJabatan extends Model
         'jabatan_id',
         'unit_kerja_id',
         'induk_unit_kerja_id',
-        'jenis_jabatan',
+        'jenis_jabatan_id', // Changed from 'jenis_jabatan'
+        'jenjang_id',
+        'golongan_id',
         'tanggal_masuk',
+        'tanggal_keluar', // Added
         'tmt',
         'jenis_pns',
         'no_sk',
@@ -31,6 +34,7 @@ class RiwayatJabatan extends Model
 
     protected $casts = [
         'tanggal_masuk' => 'date',
+        'tanggal_keluar' => 'date', // Added
         'tmt' => 'date',
         'tanggal_sk' => 'date',
         'tanggal_pelantikan' => 'date',
@@ -54,5 +58,20 @@ class RiwayatJabatan extends Model
     public function indukUnitKerja()
     {
         return $this->belongsTo(IndukUnitKerja::class);
+    }
+
+    public function jenisJabatan()
+    {
+        return $this->belongsTo(JenisJabatan::class);
+    }
+
+    public function jenjang()
+    {
+        return $this->belongsTo(Jenjang::class);
+    }
+
+    public function golongan()
+    {
+        return $this->belongsTo(Golongan::class);
     }
 }

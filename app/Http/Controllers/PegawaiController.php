@@ -25,6 +25,7 @@ use App\Models\IndukUnitKerja;
 use App\Models\JenisJabatan;
 use App\Models\Jenjang;
 use App\Models\Golongan;
+use App\Models\RiwayatJabatan;
 
 class PegawaiController extends Controller
 {
@@ -586,5 +587,86 @@ class PegawaiController extends Controller
         Pegawai::create($validatedData);
 
         return redirect()->route('pegawai.myBiodataEdit')->with('success', 'Biodata berhasil disimpan!');
+    }
+
+    public function updateJabatan(Request $request, Pegawai $pegawai)
+    {
+        $validatedData = $request->validate([
+            'new_jabatan_id' => 'required|exists:jabatans,id',
+            'new_jenis_jabatan_id' => 'required|exists:jenis_jabatans,id',
+            'new_jenjang_id' => 'required|exists:jenjangs,id',
+            'new_golongan_id' => 'required|exists:golongans,id',
+            'new_unit_kerja_id' => 'required|exists:unit_kerja,id',
+            'new_induk_unit_kerja_id' => 'required|exists:induk_unit_kerja,id',
+            'tanggal_masuk_baru' => 'required|date',
+            'new_tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk_baru', // Added validation
+            'no_sk' => 'nullable|string|max:255',
+            'tanggal_sk' => 'nullable|date',
+            'pejabat_penetap' => 'nullable|string|max:255',
+        ]);
+
+        // Find the currently active riwayat_jabatan record
+        $currentRiwayat = $pegawai->riwayatJabatan()->whereNull('tanggal_keluar')->first();
+
+        // If there's an active record, set its tanggal_keluar
+        if ($currentRiwayat) {
+            $currentRiwayat->tanggal_keluar = \Carbon\Carbon::parse($validatedData['tanggal_masuk_baru'])->subDay();
+            $currentRiwayat->save();
+        }
+
+        // Update the pegawai's current position
+        $pegawai->update([
+            'jabatan_id' => $validatedData['new_jabatan_id'],
+            'jenis_jabatan_id' => $validatedData['new_jenis_jabatan_id'],
+            'jenjang_id' => $validatedData['new_jenjang_id'],
+            'golongan_id' => $validatedData['new_golongan_id'],
+            'unit_kerja_id' => $validatedData['new_unit_kerja_id'],
+            'induk_unit_kerja_id' => $validatedData['new_induk_unit_kerja_id'],
+        ]);
+
+        // Create a new riwayat_jabatan record
+        $pegawai->riwayatJabatan()->create([
+            'jabatan_id' => $validatedData['new_jabatan_id'],
+            'jenis_jabatan_id' => $validatedData['new_jenis_jabatan_id'],
+            'jenjang_id' => $validatedData['new_jenjang_id'],
+            'golongan_id' => $validatedData['new_golongan_id'],
+            'unit_kerja_id' => $validatedData['new_unit_kerja_id'],
+            'induk_unit_kerja_id' => $validatedData['new_induk_unit_kerja_id'],
+            'tanggal_masuk' => $validatedData['tanggal_masuk_baru'],
+            'tanggal_keluar' => $validatedData['new_tanggal_keluar'] ?? null, // Use the new tanggal_keluar if provided
+            'no_sk' => $validatedData['no_sk'],
+            'tanggal_sk' => $validatedData['tanggal_sk'],
+            'pejabat_penetap' => $validatedData['pejabat_penetap'],
+        ]);
+
+        return redirect()->route('pegawai.edit', $pegawai->id)->with('success', 'Perubahan jabatan berhasil disimpan!');
+    }
+
+    public function updateRiwayatJabatan(Request $request, Pegawai $pegawai, RiwayatJabatan $riwayat_jabatan)
+    {
+        $validatedData = $request->validate([
+            'jabatan_id' => 'required|exists:jabatans,id',
+            'jenis_jabatan_id' => 'required|exists:jenis_jabatans,id',
+            'jenjang_id' => 'required|exists:jenjangs,id',
+            'golongan_id' => 'required|exists:golongans,id',
+            'unit_kerja_id' => 'required|exists:unit_kerja,id',
+            'induk_unit_kerja_id' => 'required|exists:induk_unit_kerja,id',
+            'tanggal_masuk' => 'required|date',
+            'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
+            'no_sk' => 'nullable|string|max:255',
+            'tanggal_sk' => 'nullable|date',
+            'pejabat_penetap' => 'nullable|string|max:255',
+        ]);
+
+        $riwayat_jabatan->update($validatedData);
+
+        return redirect()->route('pegawai.edit', $pegawai->id)->with('success', 'Riwayat jabatan berhasil diperbarui!');
+    }
+
+    public function destroyRiwayatJabatan(Pegawai $pegawai, RiwayatJabatan $riwayat_jabatan)
+    {
+        $riwayat_jabatan->delete(); // Soft delete
+
+        return redirect()->route('pegawai.edit', $pegawai->id)->with('success', 'Riwayat jabatan berhasil dihapus!');
     }
 }

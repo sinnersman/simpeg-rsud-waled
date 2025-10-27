@@ -41,6 +41,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Keterangan Tambahan</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="riwayat-jabatan-tab" data-bs-toggle="tab" data-bs-target="#riwayat-jabatan" type="button" role="tab" aria-controls="riwayat-jabatan" aria-selected="false">Riwayat Jabatan</button>
+                    </li>
                     @if(auth()->user()->role === 'pegawai')
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">Riwayat Pengajuan Perubahan</button>
@@ -368,6 +371,72 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- Riwayat Jabatan Tab --}}
+                        <div class="tab-pane fade" id="riwayat-jabatan" role="tabpanel" aria-labelledby="riwayat-jabatan-tab">
+                            <h5 class="mb-3 mt-4">Riwayat Jabatan Pegawai</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Jabatan</th>
+                                            <th>Jenis Jabatan</th>
+                                            <th>Jenjang</th>
+                                            <th>Golongan</th>
+                                            <th>Unit Kerja</th>
+                                            <th>Induk Unit Kerja</th>
+                                            <th>Tanggal Masuk</th>
+                                            <th>Tanggal Keluar</th>
+                                            <th>No. SK</th>
+                                            <th>Pejabat Penetap</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($pegawai->riwayatJabatan as $riwayat)
+                                            <tr>
+                                                <td>{{ $riwayat->jabatan->nama_jabatan ?? '-' }}</td>
+                                                <td>{{ $riwayat->jenisJabatan->nama ?? '-' }}</td>
+                                                <td>{{ $riwayat->jenjang->nama ?? '-' }}</td>
+                                                <td>{{ ($riwayat->golongan->golongan ?? '-') . ' - ' . ($riwayat->golongan->pangkat ?? '-') }}</td>
+                                                <td>{{ $riwayat->unitKerja->nama_unit_kerja ?? '-' }}</td>
+                                                <td>{{ $riwayat->indukUnitKerja->nama_induk_unit_kerja ?? '-' }}</td>
+                                                <td>{{ $riwayat->tanggal_masuk ? \Carbon\Carbon::parse($riwayat->tanggal_masuk)->format('d-m-Y') : '-' }}</td>
+                                                <td>{{ $riwayat->tanggal_keluar ? \Carbon\Carbon::parse($riwayat->tanggal_keluar)->format('d-m-Y') : '-' }}</td>
+                                                <td>{{ $riwayat->no_sk ?? '-' }}</td>
+                                                <td>{{ $riwayat->pejabat_penetap ?? '-' }}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-primary btn-sm edit-riwayat-jabatan"
+                                                            data-bs-toggle="modal" data-bs-target="#editRiwayatJabatanModal"
+                                                            data-id="{{ $riwayat->id }}"
+                                                            data-jabatan_id="{{ $riwayat->jabatan_id }}"
+                                                            data-jenis_jabatan_id="{{ $riwayat->jenis_jabatan_id }}"
+                                                            data-jenjang_id="{{ $riwayat->jenjang_id }}"
+                                                            data-golongan_id="{{ $riwayat->golongan_id }}"
+                                                            data-unit_kerja_id="{{ $riwayat->unit_kerja_id }}"
+                                                            data-induk_unit_kerja_id="{{ $riwayat->induk_unit_kerja_id }}"
+                                                            data-tanggal_masuk="{{ $riwayat->tanggal_masuk ? \Carbon\Carbon::parse($riwayat->tanggal_masuk)->format('Y-m-d') : '' }}"
+                                                            data-tanggal_keluar="{{ $riwayat->tanggal_keluar ? \Carbon\Carbon::parse($riwayat->tanggal_keluar)->format('Y-m-d') : '' }}"
+                                                            data-no_sk="{{ $riwayat->no_sk }}"
+                                                            data-tanggal_sk="{{ $riwayat->tanggal_sk ? \Carbon\Carbon::parse($riwayat->tanggal_sk)->format('Y-m-d') : '' }}"
+                                                            data-pejabat_penetap="{{ $riwayat->pejabat_penetap }}">
+                                                        Edit
+                                                    </button>
+                                                    <form action="{{ route('pegawai.destroyRiwayatJabatan', ['pegawai' => $pegawai->id, 'riwayat_jabatan' => $riwayat->id]) }}" method="POST" style="display:inline-block;" id="deleteRiwayatJabatanForm_{{ $riwayat->id }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger btn-sm delete-riwayat-jabatan-btn" data-id="{{ $riwayat->id }}">Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="10" class="text-center">Tidak ada riwayat jabatan.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                         
                         @if(auth()->user()->role === 'pegawai')
                         {{-- Riwayat Pengajuan Perubahan Tab --}}
@@ -382,10 +451,216 @@
                         @endif
                         
                         <button type="submit" class="btn btn-primary me-2">Update Data</button>
-                                                <a href="{{ auth()->user()->role === 'pegawai' ? route('dashboard.index') : route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
+                        <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#promotionDemotionModal">Promosi / Demosi</button>
+                        <a href="{{ auth()->user()->role === 'pegawai' ? route('dashboard.index') : route('pegawai.index') }}" class="btn btn-secondary">Batal</a>
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Promotion/Demotion Modal -->
+<div class="modal fade" id="promotionDemotionModal" tabindex="-1" aria-labelledby="promotionDemotionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promotionDemotionModalLabel">Promosi / Demosi Pegawai</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('pegawai.updateJabatan', $pegawai->id) }}">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="new_jabatan_id" class="form-label">Jabatan Baru</label>
+                            <select class="form-select" id="new_jabatan_id" name="new_jabatan_id" data-placeholder="Pilih Jabatan Baru">
+                                <option value="">Pilih Jabatan Baru</option>
+                                @foreach ($jabatans as $jabatan)
+                                    <option value="{{ $jabatan->id }}">{{ $jabatan->nama_jabatan }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="new_jenis_jabatan_id" class="form-label">Jenis Jabatan Baru</label>
+                            <select class="form-select" id="new_jenis_jabatan_id" name="new_jenis_jabatan_id" data-placeholder="Pilih Jenis Jabatan Baru">
+                                <option value="">Pilih Jenis Jabatan Baru</option>
+                                @foreach ($jenisJabatans as $jenisJabatan)
+                                    <option value="{{ $jenisJabatan->id }}">{{ $jenisJabatan->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="new_jenjang_id" class="form-label">Jenjang Baru</label>
+                            <select class="form-select" id="new_jenjang_id" name="new_jenjang_id" data-placeholder="Pilih Jenjang Baru">
+                                <option value="">Pilih Jenjang Baru</option>
+                                @foreach ($jenjangs as $jenjang)
+                                    <option value="{{ $jenjang->id }}">{{ $jenjang->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="new_golongan_id" class="form-label">Golongan Baru</label>
+                            <select class="form-select" id="new_golongan_id" name="new_golongan_id" data-placeholder="Pilih Golongan Baru">
+                                <option value="">Pilih Golongan Baru</option>
+                                @foreach ($golongans as $golongan)
+                                    <option value="{{ $golongan->id }}">{{ $golongan->golongan }} - {{ $golongan->pangkat }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="new_unit_kerja_id" class="form-label">Unit Kerja Baru</label>
+                            <select class="form-select" id="new_unit_kerja_id" name="new_unit_kerja_id" data-placeholder="Pilih Unit Kerja Baru">
+                                <option value="">Pilih Unit Kerja Baru</option>
+                                @foreach ($unitKerjas as $unitKerja)
+                                    <option value="{{ $unitKerja->id }}">{{ $unitKerja->nama_unit_kerja }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="new_induk_unit_kerja_id" class="form-label">Induk Unit Kerja Baru</label>
+                            <select class="form-select" id="new_induk_unit_kerja_id" name="new_induk_unit_kerja_id" data-placeholder="Pilih Induk Unit Kerja Baru">
+                                <option value="">Pilih Induk Unit Kerja Baru</option>
+                                @foreach ($indukUnitKerjas as $indukUnitKerja)
+                                    <option value="{{ $indukUnitKerja->id }}">{{ $indukUnitKerja->nama_induk_unit_kerja }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tanggal_masuk_baru" class="form-label">Tanggal Mulai Jabatan Baru</label>
+                        <input type="date" class="form-control" id="tanggal_masuk_baru" name="tanggal_masuk_baru" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_tanggal_keluar" class="form-label">Tanggal Selesai Jabatan (Opsional)</label>
+                        <input type="date" class="form-control" id="new_tanggal_keluar" name="new_tanggal_keluar">
+                    </div>
+                    <div class="mb-3">
+                        <label for="no_sk" class="form-label">Nomor SK</label>
+                        <input type="text" class="form-control" id="no_sk" name="no_sk">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tanggal_sk" class="form-label">Tanggal SK</label>
+                        <input type="date" class="form-control" id="tanggal_sk" name="tanggal_sk">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pejabat_penetap" class="form-label">Pejabat Penetap</label>
+                        <input type="text" class="form-control" id="pejabat_penetap" name="pejabat_penetap">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan Jabatan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Riwayat Jabatan Modal -->
+<div class="modal fade" id="editRiwayatJabatanModal" tabindex="-1" aria-labelledby="editRiwayatJabatanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRiwayatJabatanModalLabel">Edit Riwayat Jabatan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="editRiwayatJabatanForm">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <input type="hidden" name="riwayat_jabatan_id" id="edit_riwayat_jabatan_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_jabatan_id" class="form-label">Jabatan</label>
+                            <select class="form-select" id="edit_jabatan_id" name="jabatan_id" data-placeholder="Pilih Jabatan">
+                                <option value="">Pilih Jabatan</option>
+                                @foreach ($jabatans as $jabatan)
+                                    <option value="{{ $jabatan->id }}">{{ $jabatan->nama_jabatan }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_jenis_jabatan_id" class="form-label">Jenis Jabatan</label>
+                            <select class="form-select" id="edit_jenis_jabatan_id" name="jenis_jabatan_id" data-placeholder="Pilih Jenis Jabatan">
+                                <option value="">Pilih Jenis Jabatan</option>
+                                @foreach ($jenisJabatans as $jenisJabatan)
+                                    <option value="{{ $jenisJabatan->id }}">{{ $jenisJabatan->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_jenjang_id" class="form-label">Jenjang</label>
+                            <select class="form-select" id="edit_jenjang_id" name="jenjang_id" data-placeholder="Pilih Jenjang">
+                                <option value="">Pilih Jenjang</option>
+                                @foreach ($jenjangs as $jenjang)
+                                    <option value="{{ $jenjang->id }}">{{ $jenjang->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_golongan_id" class="form-label">Golongan</label>
+                            <select class="form-select" id="edit_golongan_id" name="golongan_id" data-placeholder="Pilih Golongan">
+                                <option value="">Pilih Golongan</option>
+                                @foreach ($golongans as $golongan)
+                                    <option value="{{ $golongan->id }}">{{ $golongan->golongan }} - {{ $golongan->pangkat }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_unit_kerja_id" class="form-label">Unit Kerja</label>
+                            <select class="form-select" id="edit_unit_kerja_id" name="unit_kerja_id" data-placeholder="Pilih Unit Kerja">
+                                <option value="">Pilih Unit Kerja</option>
+                                @foreach ($unitKerjas as $unitKerja)
+                                    <option value="{{ $unitKerja->id }}">{{ $unitKerja->nama_unit_kerja }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_induk_unit_kerja_id" class="form-label">Induk Unit Kerja</label>
+                            <select class="form-select" id="edit_induk_unit_kerja_id" name="induk_unit_kerja_id" data-placeholder="Pilih Induk Unit Kerja">
+                                <option value="">Pilih Induk Unit Kerja</option>
+                                @foreach ($indukUnitKerjas as $indukUnitKerja)
+                                    <option value="{{ $indukUnitKerja->id }}">{{ $indukUnitKerja->nama_induk_unit_kerja }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_tanggal_masuk" class="form-label">Tanggal Masuk</label>
+                        <input type="date" class="form-control" id="edit_tanggal_masuk" name="tanggal_masuk" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_tanggal_keluar" class="form-label">Tanggal Keluar</label>
+                        <input type="date" class="form-control" id="edit_tanggal_keluar" name="tanggal_keluar">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_no_sk" class="form-label">Nomor SK</label>
+                        <input type="text" class="form-control" id="edit_no_sk" name="no_sk">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_tanggal_sk" class="form-label">Tanggal SK</label>
+                        <input type="date" class="form-control" id="edit_tanggal_sk" name="tanggal_sk">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_pejabat_penetap" class="form-label">Pejabat Penetap</label>
+                        <input type="text" class="form-control" id="edit_pejabat_penetap" name="pejabat_penetap">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Update Riwayat Jabatan</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -462,14 +737,32 @@
             }
         });
     });
-</script>
-<script>
+
     $(document).ready(function () {
-        // Initialize Select2 for all relevant dropdowns
+        // Allow Select2 search input to be typeable in Bootstrap modals
+        $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+        // Initialize Select2 for all relevant dropdowns on the main page
         $('#provinsi, #kabupaten, #kecamatan, #kelurahan, #jenis_kelamin, #agama, #golongan_darah, #status_perkawinan, #pendidikan_terakhir, #status_kepegawaian, #jabatan_id, #jenis_jabatan_id, #jenjang_id, #golongan_id, #unit_kerja_id, #induk_unit_kerja_id').select2({
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),
+        });
+
+        // Initialize Select2 for dropdowns inside the modal when the modal is shown
+        $('#promotionDemotionModal').on('shown.bs.modal', function () {
+            $('#new_jabatan_id, #new_jenis_jabatan_id, #new_jenjang_id, #new_golongan_id, #new_unit_kerja_id, #new_induk_unit_kerja_id').each(function() {
+                $(this).select2({
+                    theme: "bootstrap-5",
+                    width: '100%', // Set a fixed width for consistency
+                    placeholder: "Pilih...", // Generic placeholder
+                    allowClear: true, // Allows clearing the selection
+                    minimumResultsForSearch: 0, // Always show search input
+                    dropdownParent: $('#promotionDemotionModal') // Append dropdown to the modal
+                }).on('select2:open', function (e) {
+                    // Ensure the search input within Select2 gets focus
+                    $('.select2-search__field').focus();
+                });
+            });
         });
 
         // Function to load cities based on province
@@ -606,15 +899,84 @@
         $('#pendidikan_terakhir').val("{{ old('pendidikan_terakhir', $pegawai->pendidikan_terakhir) }}").trigger('change.select2');
         $('#status_kepegawaian').val("{{ old('status_kepegawaian', $pegawai->status_kepegawaian) }}").trigger('change.select2');
 
-    });
-</script>
-<script>
-    $(document).ready(function() {
+        // Handle Edit Riwayat Jabatan Modal
+        $('#editRiwayatJabatanModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var riwayatId = button.data('id');
+            var jabatanId = button.data('jabatan_id');
+            var jenisJabatanId = button.data('jenis_jabatan_id');
+            var jenjangId = button.data('jenjang_id');
+            var golonganId = button.data('golongan_id');
+            var unitKerjaId = button.data('unit_kerja_id');
+            var indukUnitKerjaId = button.data('induk_unit_kerja_id');
+            var tanggalMasuk = button.data('tanggal_masuk');
+            var tanggalKeluar = button.data('tanggal_keluar');
+            var noSk = button.data('no_sk');
+            var tanggalSk = button.data('tanggal_sk');
+            var pejabatPenetap = button.data('pejabat_penetap');
+
+            var modal = $(this);
+            modal.find('#edit_riwayat_jabatan_id').val(riwayatId);
+            modal.find('#edit_tanggal_masuk').val(tanggalMasuk);
+            modal.find('#edit_tanggal_keluar').val(tanggalKeluar);
+            modal.find('#edit_no_sk').val(noSk);
+            modal.find('#edit_tanggal_sk').val(tanggalSk);
+            modal.find('#edit_pejabat_penetap').val(pejabatPenetap);
+
+            // Set form action
+            var form = modal.find('#editRiwayatJabatanForm');
+            form.attr('action', '{{ route('pegawai.updateRiwayatJabatan', ['pegawai' => $pegawai->id, 'riwayat_jabatan' => ':riwayat_jabatan_id']) }}'.replace(':riwayat_jabatan_id', riwayatId));
+
+            // Initialize Select2 for modal dropdowns and set selected values
+            modal.find('#edit_jabatan_id').val(jabatanId).trigger('change');
+            modal.find('#edit_jenis_jabatan_id').val(jenisJabatanId).trigger('change');
+            modal.find('#edit_jenjang_id').val(jenjangId).trigger('change');
+            modal.find('#edit_golongan_id').val(golonganId).trigger('change');
+            modal.find('#edit_unit_kerja_id').val(unitKerjaId).trigger('change');
+            modal.find('#edit_induk_unit_kerja_id').val(indukUnitKerjaId).trigger('change');
+
+            // Re-initialize select2 for the modal dropdowns
+            modal.find('#edit_jabatan_id, #edit_jenis_jabatan_id, #edit_jenjang_id, #edit_golongan_id, #edit_unit_kerja_id, #edit_induk_unit_kerja_id').each(function() {
+                $(this).select2({
+                    theme: "bootstrap-5",
+                    width: '100%',
+                    placeholder: $(this).data('placeholder'),
+                    allowClear: true,
+                    minimumResultsForSearch: 0,
+                    dropdownParent: $('#editRiwayatJabatanModal')
+                }).on('select2:open', function (e) {
+                    $('.select2-search__field').focus();
+                });
+            });
+        });
+
         $('#rejectionReasonModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             var reason = button.data('reason'); // Extract info from data-* attributes
             var modal = $(this);
             modal.find('#modalRejectionReason').text(reason);
+        });
+
+        // Handle delete confirmation with SweetAlert2
+        $(document).on('click', '.delete-riwayat-jabatan-btn', function (e) {
+            e.preventDefault();
+            var riwayatId = $(this).data('id');
+            var form = $('#deleteRiwayatJabatanForm_' + riwayatId);
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak akan dapat mengembalikan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
         });
     });
 </script>
