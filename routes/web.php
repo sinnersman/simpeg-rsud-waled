@@ -69,6 +69,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('jenjang/download-template', [\App\Http\Controllers\JenjangController::class, 'downloadTemplate'])->name('jenjang.downloadTemplate');
     Route::resource('jenjang', \App\Http\Controllers\JenjangController::class)->except(['show']);
 
+    // Master Golongan
+    Route::get('golongan/trash', [\App\Http\Controllers\GolonganController::class, 'trash'])->name('golongan.trash');
+    Route::get('golongan/{id}/restore', [\App\Http\Controllers\GolonganController::class, 'restore'])->name('golongan.restore');
+    Route::delete('golongan/{id}/force-delete', [\App\Http\Controllers\GolonganController::class, 'forceDelete'])->name('golongan.forceDelete');
+    Route::get('golongan/download-template', [\App\Http\Controllers\GolonganController::class, 'downloadTemplate'])->name('golongan.downloadTemplate');
+    Route::post('golongan/import-excel', [\App\Http\Controllers\GolonganController::class, 'importExcel'])->name('golongan.importExcel');
+    Route::resource('golongan', \App\Http\Controllers\GolonganController::class)->except(['show']);
+
     // Master Induk Unit Kerja
     Route::get('induk_unit_kerja/trash', [\App\Http\Controllers\IndukUnitKerjaController::class, 'trash'])->name('induk_unit_kerja.trash');
     Route::get('induk_unit_kerja/{id}/restore', [\App\Http\Controllers\IndukUnitKerjaController::class, 'restore'])->name('induk_unit_kerja.restore');

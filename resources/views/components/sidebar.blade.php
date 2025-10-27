@@ -97,6 +97,9 @@
                                 <a href="{{ route('jenjang.index') }}" class="nav-link">Master Jenjang</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('golongan.index') }}" class="nav-link">Master Golongan</a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('unit_kerja.index') }}" class="nav-link">Data Unit Kerja</a>
                             </li>
                             <li class="nav-item">
