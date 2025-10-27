@@ -20,6 +20,12 @@
                         <span class="link-title">Dashboard</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('organization.chart') }}" class="nav-link">
+                        <i class="link-icon" data-lucide="git-branch"></i>
+                        <span class="link-title">Struktur Organisasi</span>
+                    </a>
+                </li>
                 @if(Auth::user()->role === 'pegawai')
                 <li class="nav-item">
                     <a href="{{ route('pegawai.myBiodataEdit') }}" class="nav-link">

@@ -24,7 +24,7 @@ class JenjangSeeder extends Seeder
         ];
 
         foreach ($jenjangs as $jenjang) {
-            Jenjang::create($jenjang);
+            Jenjang::firstOrCreate(['kode' => $jenjang['kode']], $jenjang);
         }
     }
 }

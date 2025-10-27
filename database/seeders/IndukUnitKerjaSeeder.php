@@ -28,7 +28,7 @@ class IndukUnitKerjaSeeder extends Seeder
         ];
 
         foreach ($indukUnitKerjaData as $data) {
-            IndukUnitKerja::create($data);
+            IndukUnitKerja::firstOrCreate(['kode' => $data['kode']], $data);
         }
     }
 }

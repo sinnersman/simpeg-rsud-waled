@@ -23,7 +23,7 @@ class JenisJabatanSeeder extends Seeder
         ];
 
         foreach ($jenisJabatans as $jenisJabatan) {
-            JenisJabatan::create($jenisJabatan);
+            JenisJabatan::firstOrCreate(['kode' => $jenisJabatan['kode']], $jenisJabatan);
         }
     }
 }

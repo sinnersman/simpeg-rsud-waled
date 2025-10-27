@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             GolonganSeeder::class,
             JabatanSeeder::class,
             IndukUnitKerjaSeeder::class,
-            UnitKerjaSeeder::class,
+            OrganizationHierarchySeeder::class,
             UserSeeder::class,
         ]);
     }
