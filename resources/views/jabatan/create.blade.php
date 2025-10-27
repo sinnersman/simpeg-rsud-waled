@@ -9,16 +9,16 @@
                 <p class="text-muted mb-3">Isi semua kolom yang diperlukan untuk menambahkan data jabatan baru.</p>
                 
                 @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger">
+                    <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
-
+                
                 <form method="POST" action="{{ route('jabatan.store') }}">
                     @csrf
                     <div class="mb-3">
@@ -34,7 +34,7 @@
                         <select class="form-select" id="jenis_jabatan_id" name="jenis_jabatan_id">
                             <option value="">Pilih Jenis Jabatan</option>
                             @foreach ($jenisJabatans as $jenisJabatan)
-                                <option value="{{ $jenisJabatan->id }}">{{ $jenisJabatan->nama }}</option>
+                            <option value="{{ $jenisJabatan->id }}">{{ $jenisJabatan->nama }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -43,7 +43,7 @@
                         <select class="form-select" id="jenjang_id" name="jenjang_id">
                             <option value="">Pilih Jenjang</option>
                             @foreach ($jenjangs as $jenjang)
-                                <option value="{{ $jenjang->id }}">{{ $jenjang->nama }}</option>
+                            <option value="{{ $jenjang->id }}">{{ $jenjang->nama }}</option>
                             @endforeach
                         </select>
                     </div>

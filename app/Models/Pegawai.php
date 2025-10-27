@@ -49,7 +49,43 @@ class Pegawai extends Model
         'no_karis_karsu',
         'no_npwp',
         'no_korpri',
+        'jabatan_id',
+        'jenis_jabatan_id',
+        'jenjang_id',
+        'golongan_id',
+        'unit_kerja_id',
+        'induk_unit_kerja_id',
     ];
+
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class);
+    }
+
+    public function jenisJabatan()
+    {
+        return $this->belongsTo(JenisJabatan::class);
+    }
+
+    public function jenjang()
+    {
+        return $this->belongsTo(Jenjang::class);
+    }
+
+    public function golongan()
+    {
+        return $this->belongsTo(Golongan::class);
+    }
+
+    public function unitKerja()
+    {
+        return $this->belongsTo(UnitKerja::class, 'unit_kerja_id');
+    }
+
+    public function indukUnitKerja()
+    {
+        return $this->belongsTo(IndukUnitKerja::class, 'induk_unit_kerja_id');
+    }
 
     public function riwayatJabatan()
     {

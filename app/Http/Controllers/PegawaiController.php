@@ -22,6 +22,9 @@ use App\DataTables\RiwayatJabatanDataTable;
 use App\Models\Jabatan;
 use App\Models\UnitKerja;
 use App\Models\IndukUnitKerja;
+use App\Models\JenisJabatan;
+use App\Models\Jenjang;
+use App\Models\Golongan;
 
 class PegawaiController extends Controller
 {
@@ -51,7 +54,14 @@ class PegawaiController extends Controller
             ['name' => 'Tambah Pegawai', 'active' => true],
         ];
 
-        return view('pegawai.create', compact('title', 'breadcrumbs'));
+        $jabatans = Jabatan::all();
+        $jenisJabatans = JenisJabatan::all();
+        $jenjangs = Jenjang::all();
+        $golongans = Golongan::all();
+        $unitKerjas = UnitKerja::all();
+        $indukUnitKerjas = IndukUnitKerja::all();
+
+        return view('pegawai.create', compact('title', 'breadcrumbs', 'jabatans', 'jenisJabatans', 'jenjangs', 'golongans', 'unitKerjas', 'indukUnitKerjas'));
     }
 
     /**
@@ -97,6 +107,12 @@ class PegawaiController extends Controller
             'no_karis_karsu' => 'nullable|string|max:255',
             'no_npwp' => 'nullable|string|max:255',
             'no_korpri' => 'nullable|string|max:255',
+            'jabatan_id' => 'nullable|exists:jabatans,id',
+            'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
+            'jenjang_id' => 'nullable|exists:jenjangs,id',
+            'golongan_id' => 'nullable|exists:golongans,id',
+            'unit_kerja_id' => 'nullable|exists:unit_kerja,id',
+            'induk_unit_kerja_id' => 'nullable|exists:induk_unit_kerja,id',
         ]);
 
         // Convert IDs to names before saving
@@ -165,6 +181,13 @@ class PegawaiController extends Controller
         $selectedCityId = null;
         $selectedDistrictId = null;
         $selectedVillageId = null;
+        $jabatans = \App\Models\Jabatan::all();
+        $jenisJabatans = \App\Models\JenisJabatan::all();
+        $jenjangs = \App\Models\Jenjang::all();
+        $golongans = \App\Models\Golongan::all();
+        $unitKerjas = \App\Models\UnitKerja::all();
+        $indukUnitKerjas = \App\Models\IndukUnitKerja::all();
+
 
         return view('pegawai.edit', compact(
             'pegawai',
@@ -174,7 +197,13 @@ class PegawaiController extends Controller
             'selectedProvinceId',
             'selectedCityId',
             'selectedDistrictId',
-            'selectedVillageId'
+            'selectedVillageId',
+            'jabatans',
+            'jenisJabatans',
+            'jenjangs',
+            'golongans',
+            'unitKerjas',
+            'indukUnitKerjas'
         ));
     }
 
@@ -223,6 +252,12 @@ class PegawaiController extends Controller
             'no_karis_karsu' => 'nullable|string|max:255',
             'no_npwp' => 'nullable|string|max:255',
             'no_korpri' => 'nullable|string|max:255',
+            'jabatan_id' => 'nullable|exists:jabatans,id',
+            'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
+            'jenjang_id' => 'nullable|exists:jenjangs,id',
+            'golongan_id' => 'nullable|exists:golongans,id',
+            'unit_kerja_id' => 'nullable|exists:unit_kerja,id',
+            'induk_unit_kerja_id' => 'nullable|exists:induk_unit_kerja,id',
         ]);
 
         // Convert IDs to names before saving
@@ -326,49 +361,18 @@ class PegawaiController extends Controller
         // Pass the pegawaiId to the DataTable instance
         $dataTable->pegawaiId = $pegawai->id;
 
-        // Convert stored names to IDs for pre-selection in dropdowns
+        // Pass null for selected location IDs when accessed by superadmin
         $selectedProvinceId = null;
         $selectedCityId = null;
         $selectedDistrictId = null;
         $selectedVillageId = null;
 
-        if ($pegawai->provinsi) {
-            $provinceName = trim($pegawai->provinsi);
-            $province = Province::whereRaw('LOWER(name) = ?', [strtolower($provinceName)])->first();
-            if ($province) {
-                $selectedProvinceId = $province->id;
-
-                if ($pegawai->kabupaten) {
-                    $cityName = trim($pegawai->kabupaten);
-                    $city = City::where('province_code', $selectedProvinceId) // Changed from province_id to province_code
-                                ->whereRaw('LOWER(name) = ?', [strtolower($cityName)])
-                                ->first();
-                    if ($city) {
-                        $selectedCityId = $city->id;
-
-                        if ($pegawai->kecamatan) {
-                            $districtName = trim($pegawai->kecamatan);
-                            $district = District::where('city_code', $selectedCityId) // Changed from city_id to city_code
-                                                ->whereRaw('LOWER(name) = ?', [strtolower($districtName)])
-                                                ->first();
-                            if ($district) {
-                                $selectedDistrictId = $district->id;
-
-                                if ($pegawai->kelurahan) {
-                                    $villageName = trim($pegawai->kelurahan);
-                                    $village = Village::where('district_code', $selectedDistrictId) // Changed from district_id to district_code
-                                                    ->whereRaw('LOWER(name) = ?', [strtolower($villageName)])
-                                                    ->first();
-                                    if ($village) {
-                                        $selectedVillageId = $village->id;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        $jabatans = Jabatan::all();
+        $jenisJabatans = JenisJabatan::all();
+        $jenjangs = Jenjang::all();
+        $golongans = Golongan::all();
+        $unitKerjas = UnitKerja::all();
+        $indukUnitKerjas = IndukUnitKerja::all();
 
         return $dataTable->render('pegawai.edit', compact(
             'pegawai',
@@ -377,7 +381,13 @@ class PegawaiController extends Controller
             'selectedProvinceId',
             'selectedCityId',
             'selectedDistrictId',
-            'selectedVillageId'
+            'selectedVillageId',
+            'jabatans',
+            'jenisJabatans',
+            'jenjangs',
+            'golongans',
+            'unitKerjas',
+            'indukUnitKerjas'
         ));
     }
 
@@ -543,6 +553,12 @@ class PegawaiController extends Controller
             'no_karis_karsu' => 'nullable|string|max:255',
             'no_npwp' => 'nullable|string|max:255',
             'no_korpri' => 'nullable|string|max:255',
+            'jabatan_id' => 'nullable|exists:jabatans,id',
+            'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
+            'jenjang_id' => 'nullable|exists:jenjangs,id',
+            'golongan_id' => 'nullable|exists:golongans,id',
+            'unit_kerja_id' => 'nullable|exists:unit_kerja,id',
+            'induk_unit_kerja_id' => 'nullable|exists:induk_unit_kerja,id',
         ]);
 
         // Convert IDs to names before saving

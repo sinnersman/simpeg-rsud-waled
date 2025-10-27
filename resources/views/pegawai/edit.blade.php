@@ -178,6 +178,66 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="jabatan_id" class="form-label">Jabatan</label>
+                                    <select class="form-select" id="jabatan_id" name="jabatan_id">
+                                        <option value="">Pilih Jabatan</option>
+                                        @foreach ($jabatans as $jabatan)
+                                            <option value="{{ $jabatan->id }}" {{ old('jabatan_id', $pegawai->jabatan_id) == $jabatan->id ? 'selected' : '' }}>{{ $jabatan->nama_jabatan }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="jenis_jabatan_id" class="form-label">Jenis Jabatan</label>
+                                    <select class="form-select" id="jenis_jabatan_id" name="jenis_jabatan_id">
+                                        <option value="">Pilih Jenis Jabatan</option>
+                                        @foreach ($jenisJabatans as $jenisJabatan)
+                                            <option value="{{ $jenisJabatan->id }}" {{ old('jenis_jabatan_id', $pegawai->jenis_jabatan_id) == $jenisJabatan->id ? 'selected' : '' }}>{{ $jenisJabatan->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="jenjang_id" class="form-label">Jenjang</label>
+                                    <select class="form-select" id="jenjang_id" name="jenjang_id">
+                                        <option value="">Pilih Jenjang</option>
+                                        @foreach ($jenjangs as $jenjang)
+                                            <option value="{{ $jenjang->id }}" {{ old('jenjang_id', $pegawai->jenjang_id) == $jenjang->id ? 'selected' : '' }}>{{ $jenjang->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="golongan_id" class="form-label">Golongan</label>
+                                    <select class="form-select" id="golongan_id" name="golongan_id">
+                                        <option value="">Pilih Golongan</option>
+                                        @foreach ($golongans as $golongan)
+                                            <option value="{{ $golongan->id }}" {{ old('golongan_id', $pegawai->golongan_id) == $golongan->id ? 'selected' : '' }}>{{ $golongan->golongan }} - {{ $golongan->pangkat }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="unit_kerja_id" class="form-label">Unit Kerja</label>
+                                    <select class="form-select" id="unit_kerja_id" name="unit_kerja_id">
+                                        <option value="">Pilih Unit Kerja</option>
+                                        @foreach ($unitKerjas as $unitKerja)
+                                            <option value="{{ $unitKerja->id }}" {{ old('unit_kerja_id', $pegawai->unit_kerja_id) == $unitKerja->id ? 'selected' : '' }}>{{ $unitKerja->nama_unit_kerja }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="induk_unit_kerja_id" class="form-label">Induk Unit Kerja</label>
+                                    <select class="form-select" id="induk_unit_kerja_id" name="induk_unit_kerja_id">
+                                        <option value="">Pilih Induk Unit Kerja</option>
+                                        @foreach ($indukUnitKerjas as $indukUnitKerja)
+                                            <option value="{{ $indukUnitKerja->id }}" {{ old('induk_unit_kerja_id', $pegawai->induk_unit_kerja_id) == $indukUnitKerja->id ? 'selected' : '' }}>{{ $indukUnitKerja->nama_induk_unit_kerja }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         
                         {{-- Data Alamat Pegawai Tab --}}
@@ -406,7 +466,7 @@
 <script>
     $(document).ready(function () {
         // Initialize Select2 for all relevant dropdowns
-        $('#provinsi, #kabupaten, #kecamatan, #kelurahan, #jenis_kelamin, #agama, #golongan_darah, #status_perkawinan, #pendidikan_terakhir, #status_kepegawaian').select2({
+        $('#provinsi, #kabupaten, #kecamatan, #kelurahan, #jenis_kelamin, #agama, #golongan_darah, #status_perkawinan, #pendidikan_terakhir, #status_kepegawaian, #jabatan_id, #jenis_jabatan_id, #jenjang_id, #golongan_id, #unit_kerja_id, #induk_unit_kerja_id').select2({
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),
