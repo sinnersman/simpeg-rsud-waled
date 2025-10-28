@@ -105,15 +105,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('roles', RoleController::class)->except(['show']);
 
     // User Management
+    Route::get('users/leave-impersonation', [UserController::class, 'leaveImpersonation'])->name('users.leaveImpersonation');
+    Route::get('users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
     Route::resource('users', UserController::class);
     Route::post('users/generate-pegawai-account', [UserController::class, 'generatePegawaiAccount'])->name('users.generatePegawaiAccount');
     Route::patch('users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
     Route::patch('users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 
-    // E-Jabatan
-    Route::resource('e-jabatan', \App\Http\Controllers\EJabatanController::class);
+        // E-Jabatan
+        Route::resource('e-jabatan', \App\Http\Controllers\EJabatanController::class);
 
-    Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
+        Route::get('/settings', [\App\Http\Controllers\DashboardController::class, 'settings'])->name('settings.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

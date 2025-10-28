@@ -220,4 +220,42 @@ class UserController extends Controller
             'password' => $password,
         ]);
     }
+
+    /**
+     * Impersonate a user.
+     */
+    public function impersonate(User $user)
+    {
+        // Store the original user's ID in the session
+        session()->put('impersonator_id', auth()->id());
+
+        // Log in the target user
+        auth()->login($user);
+
+        return redirect()->route('dashboard.index')->with('success', 'You are now impersonating ' . $user->name);
+    }
+
+    /**
+     * Leave impersonation.
+     */
+    public function leaveImpersonation()
+    {
+        // Get the original user's ID from the session
+        $impersonatorId = session()->get('impersonator_id');
+
+        if ($impersonatorId) {
+            // Log out the current user
+            auth()->logout();
+
+            // Log in the original user
+            auth()->loginUsingId($impersonatorId);
+
+            // Clear the impersonator ID from the session
+            session()->forget('impersonator_id');
+
+            return redirect()->route('dashboard.index')->with('success', 'You have left impersonation.');
+        }
+
+        return redirect()->route('dashboard.index')->with('error', 'No active impersonation session found.');
+    }
 }
