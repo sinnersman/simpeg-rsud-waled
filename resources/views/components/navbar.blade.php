@@ -43,28 +43,19 @@
                         </div>
                         <ul class="list-unstyled p-1">
                             <li>
-                                <a href="pages/general/profile.html" class="dropdown-item py-2 text-body ms-0">
-                                    <i class="me-2 icon-md" data-lucide="user"></i>
-                                    <span>Profile</span>
+                                <a href="#" class="dropdown-item py-2 text-body ms-0" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                    <i class="me-2 icon-md" data-lucide="lock"></i>
+                                    <span>Ubah Kata Sandi</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:;" class="dropdown-item py-2 text-body ms-0">
-                                    <i class="me-2 icon-md" data-lucide="edit"></i>
-                                    <span>Edit Profile</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:;" class="dropdown-item py-2 text-body ms-0">
-                                    <i class="me-2 icon-md" data-lucide="repeat"></i>
-                                    <span>Switch User</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:;" class="dropdown-item py-2 text-body ms-0">
-                                    <i class="me-2 icon-md" data-lucide="log-out"></i>
-                                    <span>Log Out</span>
-                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <a href="{{ route('logout') }}" class="dropdown-item py-2 text-body ms-0" onclick="event.preventDefault(); this.closest('form').submit();">
+                                        <i class="me-2 icon-md" data-lucide="log-out"></i>
+                                        <span>Log Out</span>
+                                    </a>
+                                </form>
                             </li>
                         </ul>
                     </div>

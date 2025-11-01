@@ -14,12 +14,24 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $totalPegawai = \App\Models\Pegawai::count();
+        $lakiLaki = \App\Models\Pegawai::where('jenis_kelamin', 'Laki-laki')->count();
+        $perempuan = \App\Models\Pegawai::where('jenis_kelamin', 'Perempuan')->count();
+
+        $lakiLakiPercentage = ($totalPegawai > 0) ? ($lakiLaki / $totalPegawai) * 100 : 0;
+        $perempuanPercentage = ($totalPegawai > 0) ? ($perempuan / $totalPegawai) * 100 : 0;
+
         $data = [
             'title' => 'Dashboard',
             'breadcrumbs' => [
                 ['name' => 'Main'],
                 ['name' => 'Dashboard', 'url' => route('dashboard.index')],
             ],
+            'totalPegawai' => $totalPegawai,
+            'lakiLaki' => $lakiLaki,
+            'perempuan' => $perempuan,
+            'lakiLakiPercentage' => round($lakiLakiPercentage, 2),
+            'perempuanPercentage' => round($perempuanPercentage, 2),
         ];
 
         return view('dashboard', $data);

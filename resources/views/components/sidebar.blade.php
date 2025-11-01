@@ -39,6 +39,20 @@
                         <span class="link-title">Dokumen Saya</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#eLayanan" role="button" aria-expanded="false" aria-controls="eLayanan">
+                        <i class="link-icon" data-lucide="file-plus"></i>
+                        <span class="link-title">E-Layanan</span>
+                        <i class="link-arrow" data-lucide="chevron-down"></i>
+                    </a>
+                    <div class="collapse" data-bs-parent="#sidebarNav" id="eLayanan">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('cuti.index') }}" class="nav-link">Pengajuan Cuti</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
                 @endif
                 @if(Auth::user()->role === 'superadmin')
                 <li class="nav-item">
@@ -57,6 +71,23 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('e-jabatan.index') }}" class="nav-link">Riwayat Jabatan</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#eLayanan" role="button" aria-expanded="false" aria-controls="eLayanan">
+                        <i class="link-icon" data-lucide="file-plus"></i>
+                        <span class="link-title">E-Layanan</span>
+                        <i class="link-arrow" data-lucide="chevron-down"></i>
+                    </a>
+                    <div class="collapse" data-bs-parent="#sidebarNav" id="eLayanan">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('cuti.index') }}" class="nav-link">Cuti</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('cuti.approval.index') }}" class="nav-link">Persetujuan Cuti</a>
                             </li>
                         </ul>
                     </div>

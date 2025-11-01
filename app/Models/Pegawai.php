@@ -91,4 +91,9 @@ class Pegawai extends Model
     {
         return $this->hasMany(RiwayatJabatan::class);
     }
+
+    public function cutis()
+    {
+        return $this->hasMany(Cuti::class);
+    }
 }

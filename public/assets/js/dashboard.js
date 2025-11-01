@@ -185,10 +185,10 @@
 
 
 
-  // New Customers Chart
-  const customersChartElement = document.querySelector('#customersChart');
-  if (customersChartElement) {
-    const customersChartOptions = {
+  // Total Pegawai Chart
+  const totalPegawaiChartElement = document.querySelector('#totalPegawaiChart');
+  if (totalPegawaiChartElement) {
+    const totalPegawaiChartOptions = {
       chart: {
         type: "line",
         height: 60,
@@ -198,15 +198,14 @@
       },
       series: [{
         name: '',
-        data: [3844, 3855, 3841, 3867, 3822, 3843, 3821, 3841, 3856, 3827, 3843]
+        data: [3844, 3855, 3841, 3867, 3822, 3843, 3821, 3841, 3856, 3827, 3843] // Dummy data
       }],
       xaxis: {
         type: 'datetime',
         categories: ["Jan 01 2025", "Jan 02 2025", "Jan 03 2025", "Jan 04 2025", "Jan 05 2025", "Jan 06 2025", "Jan 07 2025", "Jan 08 2025", "Jan 09 2025", "Jan 10 2025", "Jan 11 2025",],
       },
       yaxis: {
-        min: 3820,
-        max: 3870,
+        min: 0, 
         tickAmount: 4,
         labels: {
           show: false
@@ -221,61 +220,16 @@
       },
       colors: [colors.primary],
     };
-    const customersChart = new ApexCharts(customersChartElement, customersChartOptions);
-    customersChart.render();
+    const totalPegawaiChart = new ApexCharts(totalPegawaiChartElement, totalPegawaiChartOptions);
+    totalPegawaiChart.render();
   }
-  // New Customers Chart - END
+  // Total Pegawai Chart - END
 
 
-
-
-  // Orders Chart
-  const ordersChartElement = document.querySelector('#ordersChart');
-  if (ordersChartElement) {
-    const ordersChartOptions = {
-      chart: {
-        type: "bar",
-        height: 60,
-        sparkline: {
-          enabled: !0
-        }
-      },
-      plotOptions: {
-        bar: {
-          borderRadius: 2,
-          columnWidth: "60%"
-        }
-      },
-      colors: [colors.primary],
-      series: [{
-        name: '',
-        data: [36, 77, 52, 90, 74, 35, 55, 23, 47, 10, 63]
-      }],
-      xaxis: {
-        type: 'datetime',
-        categories: ["Jan 01 2025", "Jan 02 2025", "Jan 03 2025", "Jan 04 2025", "Jan 05 2025", "Jan 06 2025", "Jan 07 2025", "Jan 08 2025", "Jan 09 2025", "Jan 10 2025", "Jan 11 2025",],
-      },
-      yaxis: {
-        min: 0,
-        max: 90,
-        tickAmount: 4,
-        labels: {
-          show: false
-        }
-      },
-    };
-    const ordersChart = new ApexCharts(ordersChartElement, ordersChartOptions);
-    ordersChart.render();
-  }
-  // Orders Chart - END
-
-
-
-
-  // Growth Chart
-  const growthChartElement = document.querySelector('#growthChart');
-  if (growthChartElement) {
-    const growthChartOptions = {
+  // Laki-laki Chart
+  const lakiLakiChartElement = document.querySelector('#lakiLakiChart');
+  if (lakiLakiChartElement) {
+    const lakiLakiChartOptions = {
       chart: {
         type: "line",
         height: 60,
@@ -285,15 +239,15 @@
       },
       series: [{
         name: '',
-        data: [41, 45, 44, 46, 52, 54, 43, 74, 82, 82, 89]
+        data: [41, 45, 44, 46, 52, 54, 43, 74, 82, 82, 89] // Dummy data
       }],
       xaxis: {
         type: 'datetime',
         categories: ["Jan 01 2025", "Jan 02 2025", "Jan 03 2025", "Jan 04 2025", "Jan 05 2025", "Jan 06 2025", "Jan 07 2025", "Jan 08 2025", "Jan 09 2025", "Jan 10 2025", "Jan 11 2025",],
       },
       yaxis: {
-        min: 40,
-        max: 90,
+        min: 0,
+        max: 100,
         tickAmount: 4,
         labels: {
           formatter: function (val) {
@@ -310,10 +264,54 @@
       },
       colors: [colors.primary],
     };
-    const growthChart = new ApexCharts(growthChartElement, growthChartOptions);
-    growthChart.render();
+    const lakiLakiChart = new ApexCharts(lakiLakiChartElement, lakiLakiChartOptions);
+    lakiLakiChart.render();
   }
-  // Growth Chart - END
+  // Laki-laki Chart - END
+
+
+  // Perempuan Chart
+  const perempuanChartElement = document.querySelector('#perempuanChart');
+  if (perempuanChartElement) {
+    const perempuanChartOptions = {
+      chart: {
+        type: "line",
+        height: 60,
+        sparkline: {
+          enabled: !0
+        }
+      },
+      series: [{
+        name: '',
+        data: [41, 45, 44, 46, 52, 54, 43, 74, 82, 82, 89] // Dummy data
+      }],
+      xaxis: {
+        type: 'datetime',
+        categories: ["Jan 01 2025", "Jan 02 2025", "Jan 03 2025", "Jan 04 2025", "Jan 05 2025", "Jan 06 2025", "Jan 07 2025", "Jan 08 2025", "Jan 09 2025", "Jan 10 2025", "Jan 11 2025",],
+      },
+      yaxis: {
+        min: 0,
+        max: 100,
+        tickAmount: 4,
+        labels: {
+          formatter: function (val) {
+            return val + "%";
+          }
+        }
+      },
+      stroke: {
+        width: 2,
+        curve: "smooth"
+      },
+      markers: {
+        size: 0
+      },
+      colors: [colors.primary],
+    };
+    const perempuanChart = new ApexCharts(perempuanChartElement, perempuanChartOptions);
+    perempuanChart.render();
+  }
+  // Perempuan Chart - END
 
 
 

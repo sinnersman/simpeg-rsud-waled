@@ -102,5 +102,68 @@
         });
     </script>
 
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Ubah Kata Sandi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('password.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    @if (session('status') === 'password-updated')
+                        <div class="alert alert-success">
+                            Password updated successfully.
+                        </div>
+                    @endif
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control @error('password', 'updatePassword') is-invalid @enderror" id="password" name="password" required>
+                        @error('password', 'updatePassword')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="showPassword">
+                        <label class="form-check-label" for="showPassword">
+                            Tampilkan Kata Sandi
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        @if($errors->updatePassword->any() || session('status') === 'password-updated')
+            var changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            changePasswordModal.show();
+        @endif
+
+        $('#showPassword').on('change', function() {
+            var passwordInput = $('#password');
+            var passwordConfirmationInput = $('#password_confirmation');
+            if (this.checked) {
+                passwordInput.attr('type', 'text');
+                passwordConfirmationInput.attr('type', 'text');
+            } else {
+                passwordInput.attr('type', 'password');
+                passwordConfirmationInput.attr('type', 'password');
+            }
+        });
+    });
+</script>
 </body>
 </html>    

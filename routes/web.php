@@ -42,6 +42,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/approvals', [\App\Http\Controllers\AdminApprovalController::class, 'index'])->name('admin.approvals.index');
         Route::patch('/admin/approvals/{changeRequest}/approve', [\App\Http\Controllers\AdminApprovalController::class, 'approve'])->name('admin.approvals.approve');
         Route::patch('/admin/approvals/{changeRequest}/reject', [\App\Http\Controllers\AdminApprovalController::class, 'reject'])->name('admin.approvals.reject');
+
+        // E-Layanan
+        Route::resource('cuti', \App\Http\Controllers\CutiController::class);
+        Route::get('cuti-approval', [\App\Http\Controllers\CutiApprovalController::class, 'index'])->name('cuti.approval.index');
+        Route::patch('cuti-approval/{cuti}/approve', [\App\Http\Controllers\CutiApprovalController::class, 'approve'])->name('cuti.approval.approve');
+        Route::patch('cuti-approval/{cuti}/reject', [\App\Http\Controllers\CutiApprovalController::class, 'reject'])->name('cuti.approval.reject');
     });
 
     Route::get('/my-biodata', [PegawaiController::class, 'myBiodataEdit'])->name('pegawai.myBiodataEdit');
