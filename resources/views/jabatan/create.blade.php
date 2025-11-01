@@ -47,6 +47,15 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="parent_jabatan_id" class="form-label">Atasan Langsung (Jabatan)</label>
+                        <select class="form-select" id="parent_jabatan_id" name="parent_jabatan_id">
+                            <option value="">Pilih Atasan Langsung</option>
+                            @foreach ($jabatans as $parentJabatan)
+                            <option value="{{ $parentJabatan->id }}">{{ $parentJabatan->nama_jabatan }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary me-2">Simpan Data</button>
                         <a href="{{ route('jabatan.index') }}" class="btn btn-secondary">Batal</a>

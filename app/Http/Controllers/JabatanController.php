@@ -35,7 +35,8 @@ class JabatanController extends Controller
     {
         $jenisJabatans = JenisJabatan::all();
         $jenjangs = Jenjang::all();
-        return view('jabatan.create', compact('jenisJabatans', 'jenjangs'));
+        $jabatans = Jabatan::all(); // Get all jabatans for parent selection
+        return view('jabatan.create', compact('jenisJabatans', 'jenjangs', 'jabatans'));
     }
 
     /**
@@ -48,6 +49,7 @@ class JabatanController extends Controller
             'nama_jabatan' => 'required|string|max:255',
             'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
             'jenjang_id' => 'nullable|exists:jenjangs,id',
+            'parent_jabatan_id' => 'nullable|exists:jabatans,id',
         ]);
 
         Jabatan::create($request->all());
@@ -63,7 +65,8 @@ class JabatanController extends Controller
     {
         $jenisJabatans = JenisJabatan::all();
         $jenjangs = Jenjang::all();
-        return view('jabatan.edit', compact('jabatan', 'jenisJabatans', 'jenjangs'));
+        $jabatans = Jabatan::where('id', '!=', $jabatan->id)->get(); // Get all jabatans except the current one
+        return view('jabatan.edit', compact('jabatan', 'jenisJabatans', 'jenjangs', 'jabatans'));
     }
 
     /**
@@ -76,6 +79,7 @@ class JabatanController extends Controller
             'nama_jabatan' => 'required|string|max:255',
             'jenis_jabatan_id' => 'nullable|exists:jenis_jabatans,id',
             'jenjang_id' => 'nullable|exists:jenjangs,id',
+            'parent_jabatan_id' => 'nullable|exists:jabatans,id',
         ]);
 
         $jabatan->update($request->all());
@@ -163,5 +167,32 @@ class JabatanController extends Controller
 
         return redirect()->route('jabatan.index')
             ->with('success', 'Data Jabatan berhasil diimpor.');
+    }
+
+    public function organizationChart()
+    {
+        $title = 'Struktur Organisasi Jabatan';
+        $breadcrumbs = [
+            ['name' => 'Dashboard', 'url' => route('dashboard.index')],
+            ['name' => 'Master Jabatan', 'url' => route('jabatan.index')],
+            ['name' => 'Struktur Organisasi', 'active' => true],
+        ];
+
+        // Fetch all jabatans with their parent relationship
+        $jabatans = Jabatan::with('parent')->get();
+
+        // Transform data for OrgChart.js (or similar library)
+        // This is a basic transformation, might need adjustment based on the chosen library
+        $chartData = $jabatans->map(function ($jabatan) {
+            return [
+                'id' => $jabatan->id,
+                'pid' => $jabatan->parent_jabatan_id,
+                'name' => $jabatan->nama_jabatan,
+                'title' => $jabatan->jenisJabatan->nama ?? '', // Assuming JenisJabatan is loaded
+                // Add more fields as needed for the chart display
+            ];
+        });
+
+        return view('jabatan.organization_chart', compact('title', 'breadcrumbs', 'chartData'));
     }
 }

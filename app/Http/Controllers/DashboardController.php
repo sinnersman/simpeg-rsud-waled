@@ -39,65 +39,27 @@ class DashboardController extends Controller
 
     public function organizationChart()
     {
-        $jabatans = Jabatan::all();
+        // Fetch all jabatans with their parent relationship
+        $jabatans = Jabatan::with('parent')->get();
 
         $chartData = [];
-        $chartData[] = ['Name', 'Manager', 'ToolTip'];
+        $chartData[] = ['Name', 'Manager', 'ToolTip']; // Google Charts header
 
-        $createdJabatanNodes = []; // To store created Jabatan nodes for parent lookup
+        // Build a map of jabatan ID to its data for easy lookup
+        $jabatanMap = $jabatans->keyBy('id');
 
-        // First pass: Identify and add top-level Jabatan (e.g., DIREKTUR)
-        foreach ($jabatans as $jabatan) {
-            $jabatanName = $jabatan->nama_jabatan;
-
-            if (str_contains($jabatanName, 'DIREKTUR') && !str_contains($jabatanName, 'WAKIL')) {
-                $chartData[] = [['v' => 'jabatan_' . $jabatan->id, 'f' => $jabatanName], '', ''];
-                $createdJabatanNodes[$jabatan->id] = $jabatan;
-            }
-        }
-
-        // Second pass: Infer hierarchy for other Jabatan
+        // Add nodes to chartData
         foreach ($jabatans as $jabatan) {
             $parentId = '';
-            $jabatanName = $jabatan->nama_jabatan;
-
-            if (isset($createdJabatanNodes[$jabatan->id])) {
-                continue; // Already added as top-level
+            if ($jabatan->parent_jabatan_id && isset($jabatanMap[$jabatan->parent_jabatan_id])) {
+                $parentId = 'jabatan_' . $jabatan->parent_jabatan_id;
             }
 
-            // Heuristic to find parent based on keywords
-            if (str_contains($jabatanName, 'WAKIL DIREKTUR')) {
-                $direktur = Jabatan::where('nama_jabatan', 'DIREKTUR')->first();
-                if ($direktur) {
-                    $parentId = 'jabatan_' . $direktur->id;
-                }
-            } elseif (str_contains($jabatanName, 'KEPALA BIDANG')) {
-                $wadir = Jabatan::where('nama_jabatan', 'WAKIL DIREKTUR UMUM DAN KEUANGAN')->first(); // Assuming this is the relevant WADIR
-                if ($wadir) {
-                    $parentId = 'jabatan_' . $wadir->id;
-                }
-            } elseif (str_contains($jabatanName, 'KEPALA BAGIAN')) {
-                $kepalaBidang = Jabatan::where('nama_jabatan', 'KEPALA BIDANG PELAYANAN MEDIS DAN PENGENDALIAN MUTU')->first(); // Assuming this is the relevant KEPALA BIDANG
-                if ($kepalaBidang) {
-                    $parentId = 'jabatan_' . $kepalaBidang->id;
-                }
-            } elseif (str_contains($jabatanName, 'KEPALA SUBBAGIAN')) {
-                $kepalaBagian = Jabatan::where('nama_jabatan', 'KEPALA BAGIAN UMUM DAN KEPEGAWAIAN')->first(); // Assuming this is the relevant KEPALA BAGIAN
-                if ($kepalaBagian) {
-                    $parentId = 'jabatan_' . $kepalaBagian->id;
-                }
-            }
-
-            // Default parent if no specific parent found (e.g., under DIREKTUR if no other parent)
-            if (empty($parentId)) {
-                $direktur = Jabatan::where('nama_jabatan', 'DIREKTUR')->first();
-                if ($direktur) {
-                    $parentId = 'jabatan_' . $direktur->id;
-                }
-            }
-
-            $chartData[] = [['v' => 'jabatan_' . $jabatan->id, 'f' => $jabatanName], $parentId, ''];
-            $createdJabatanNodes[$jabatan->id] = $jabatan; // Add to created nodes for future lookups
+            $chartData[] = [
+                ['v' => 'jabatan_' . $jabatan->id, 'f' => $jabatan->nama_jabatan],
+                $parentId,
+                $jabatan->nama_jabatan // Tooltip can be the same for now
+            ];
         }
 
         $data = [

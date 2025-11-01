@@ -25,7 +25,7 @@ Route::get('/cities', [DependentDropdownController::class, 'cities'])->name('cit
 Route::get('/districts', [DependentDropdownController::class, 'districts'])->name('districts');
 Route::get('/villages', [DependentDropdownController::class, 'villages'])->name('villages');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', \App\Http\Middleware\EnsurePegawaiProfileIsComplete::class])->group(function () {
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
     Route::get('organization-chart', [\App\Http\Controllers\DashboardController::class, 'organizationChart'])->name('organization.chart');
     Route::middleware(['superadmin'])->group(function () {
@@ -44,7 +44,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/admin/approvals/{changeRequest}/reject', [\App\Http\Controllers\AdminApprovalController::class, 'reject'])->name('admin.approvals.reject');
 
         // E-Layanan
-        Route::resource('cuti', \App\Http\Controllers\CutiController::class);
         Route::get('cuti-approval', [\App\Http\Controllers\CutiApprovalController::class, 'index'])->name('cuti.approval.index');
         Route::patch('cuti-approval/{cuti}/approve', [\App\Http\Controllers\CutiApprovalController::class, 'approve'])->name('cuti.approval.approve');
         Route::patch('cuti-approval/{cuti}/reject', [\App\Http\Controllers\CutiApprovalController::class, 'reject'])->name('cuti.approval.reject');
@@ -54,10 +53,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/my-biodata', [PegawaiController::class, 'myBiodataUpdate'])->name('pegawai.myBiodataUpdate');
     Route::post('/my-biodata', [PegawaiController::class, 'myBiodataStore'])->name('pegawai.myBiodataStore');
 
+    // E-Layanan
+    Route::resource('cuti', \App\Http\Controllers\CutiController::class);
+
     // Dokumen Karyawan
     Route::resource('dokumen-karyawan', \App\Http\Controllers\DokumenKaryawanController::class);
 
     // Master Jabatan
+    Route::get('jabatan/organization-chart', [\App\Http\Controllers\JabatanController::class, 'organizationChart'])->name('jabatan.organizationChart');
     Route::get('jabatan/trash', [\App\Http\Controllers\JabatanController::class, 'trash'])->name('jabatan.trash');
     Route::get('jabatan/{id}/restore', [\App\Http\Controllers\JabatanController::class, 'restore'])->name('jabatan.restore');
     Route::delete('jabatan/{id}/force-delete', [\App\Http\Controllers\JabatanController::class, 'forceDelete'])->name('jabatan.forceDelete');

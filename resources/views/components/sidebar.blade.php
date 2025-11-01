@@ -128,6 +128,9 @@
                                 <a href="{{ route('jabatan.index') }}" class="nav-link">Data Jabatan</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('jabatan.organizationChart') }}" class="nav-link">Struktur Organisasi Jabatan</a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('jenis_jabatan.index') }}" class="nav-link">Master Jenis Jabatan</a>
                             </li>
                             <li class="nav-item">

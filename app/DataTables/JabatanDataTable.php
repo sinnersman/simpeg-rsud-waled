@@ -26,10 +26,18 @@ class JabatanDataTable extends DataTable
             ->addColumn('jenjang_nama', function ($jabatan) {
                 return $jabatan->jenjang->nama ?? '-';
             })
+            ->addColumn('nama_jabatan_formatted', function ($jabatan) {
+                $prefix = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $jabatan->depth);
+                return $prefix . $jabatan->nama_jabatan;
+            })
+            ->addColumn('parent_jabatan_name', function ($jabatan) {
+                return $jabatan->parent->nama_jabatan ?? '-';
+            })
             ->addColumn('action', function ($jabatan) {
                 return view('jabatan.action', compact('jabatan'));
             })
-            ->setRowId('id');
+            ->setRowId('id')
+            ->rawColumns(['nama_jabatan_formatted', 'action']);
     }
 
     /**
@@ -39,7 +47,7 @@ class JabatanDataTable extends DataTable
      */
     public function query(Jabatan $model): QueryBuilder
     {
-        return $model->newQuery()->with(['jenisJabatan', 'jenjang']);
+        return $model->newQuery()->with(['jenisJabatan', 'jenjang', 'parent']);
     }
 
     /**
@@ -64,9 +72,10 @@ class JabatanDataTable extends DataTable
         return [
             Column::make('DT_RowIndex')->title('No')->orderable(false)->searchable(false),
             Column::make('kode_jabatan')->title('Kode Jabatan')->addClass('text-left'),
-            Column::make('nama_jabatan'),
+            Column::computed('nama_jabatan_formatted')->title('Nama Jabatan'),
             Column::make('jenis_jabatan_nama')->title('Jenis Jabatan'),
             Column::make('jenjang_nama')->title('Jenjang'),
+            Column::make('parent_jabatan_name')->title('Atasan Langsung')->name('parent.nama_jabatan'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

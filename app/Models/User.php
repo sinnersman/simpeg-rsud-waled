@@ -27,6 +27,8 @@ class User extends Authenticatable
         'is_active',
     ];
 
+    protected $with = ['pegawai'];
+
     public function pegawai()
     {
         return $this->hasOne(Pegawai::class, 'nip', 'username');

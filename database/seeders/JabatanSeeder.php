@@ -14,6 +14,9 @@ class JabatanSeeder extends Seeder
      */
     public function run(): void
     {
+        // Clear existing data to prevent duplicates on re-seeding
+        Jabatan::truncate();
+
         $jenisJabatanMap = [
             'ST' => 'STRUKTURAL',
             'JF' => 'MEDIS', // Assumption, can be refined
@@ -121,6 +124,7 @@ class JabatanSeeder extends Seeder
             ['kode_jabatan' => 'JP14', 'nama_jabatan' => 'Teknisi Sarana dan Prasarana', 'jenis_jabatan_code' => 'JP'],
         ];
 
+        // First pass: Create Jabatan records without parent_jabatan_id
         foreach ($jabatansData as $jabatanData) {
             $jenisJabatanName = $jenisJabatanMap[$jabatanData['jenis_jabatan_code']];
             $jenisJabatan = JenisJabatan::where('nama', $jenisJabatanName)->first();
@@ -129,9 +133,70 @@ class JabatanSeeder extends Seeder
                 'kode_jabatan' => $jabatanData['kode_jabatan'],
                 'nama_jabatan' => $jabatanData['nama_jabatan'],
                 'jenis_jabatan_id' => $jenisJabatan->id ?? null,
-                // jenjang_id will be null for now, as it's not in the provided data
                 'jenjang_id' => null,
             ]);
+        }
+
+        // Second pass: Define hierarchy by setting parent_jabatan_id
+        // This is a simplified example. A more robust solution might involve a separate configuration or more complex logic.
+
+        // Get all created jabatans to easily find them by name or code
+        $jabatans = Jabatan::all()->keyBy('kode_jabatan');
+
+        // Define hierarchy relationships
+        $hierarchy = [
+            'ST2' => 'ST1', // Wakil Direktur Pelayanan dan Pendidikan reports to Direktur
+            'ST3' => 'ST1', // Wakil Direktur Umum dan Keuangan reports to Direktur
+
+            'ST4' => 'ST3', // Kepala Bagian Keuangan reports to Wakil Direktur Umum dan Keuangan
+            'ST5' => 'ST3', // Kepala Bagian Perencanaan, Hukum dan Pengembangan reports to Wakil Direktur Umum dan Keuangan
+            'ST6' => 'ST3', // Kepala Bagian Umum dan Kepegawaian reports to Wakil Direktur Umum dan Keuangan
+
+            'ST7' => 'ST2', // Kepala Bidang Pelayanan Keperawatan dan Pengendalian Mutu reports to Wakil Direktur Pelayanan dan Pendidikan
+            'ST8' => 'ST2', // Kepala Bidang Pelayanan Medis dan Pengendalian Mutu reports to Wakil Direktur Pelayanan dan Pendidikan
+            'ST9' => 'ST2', // Kepala Bidang Pelayanan Penunjang dan Pendidikan reports to Wakil Direktur Pelayanan dan Pendidikan
+
+            'ST10' => 'ST6', // Kepala Subbagian Perlengkapan dan Rumah Tangga reports to Kepala Bagian Umum dan Kepegawaian
+            'ST11' => 'ST6', // Kepala Subbagian Tata Usaha dan Kepegawaian reports to Kepala Bagian Umum dan Kepegawaian
+
+            // Example for Fungsional (JF) reporting to a Kepala Bidang
+            'JF1' => 'ST7', // Administrator Kesehatan reports to Kepala Bidang Pelayanan Keperawatan
+            'JF8' => 'ST8', // Dokter reports to Kepala Bidang Pelayanan Medis
+
+            // Example for Pelaksana (JP) reporting to a Kepala Subbagian
+            'JP1' => 'ST11', // Administrasi Umum reports to Kepala Subbagian Tata Usaha
+        ];
+
+        foreach ($hierarchy as $childKode => $parentKode) {
+            $childJabatan = $jabatans->get($childKode);
+            $parentJabatan = $jabatans->get($parentKode);
+
+            if ($childJabatan && $parentJabatan) {
+                $childJabatan->update(['parent_jabatan_id' => $parentJabatan->id]);
+            }
+        }
+
+        // Third pass: Assign default parents for remaining unassigned Jabatans (JF and JP types)
+        // This assumes JF and JP types generally report to a structural position.
+        // For simplicity, we can make them report to a relevant Kepala Bidang or Kepala Subbagian.
+        // Or, if no specific structural parent is found, they can report directly to the Direktur.
+
+        $direktur = $jabatans->get('ST1'); // Direktur
+        $kepalaBidangPelayananKeperawatan = $jabatans->get('ST7'); // Kepala Bidang Pelayanan Keperawatan
+        $kepalaBidangPelayananMedis = $jabatans->get('ST8'); // Kepala Bidang Pelayanan Medis
+        $kepalaSubbagianTataUsaha = $jabatans->get('ST11'); // Kepala Subbagian Tata Usaha
+
+        foreach ($jabatans as $jabatan) {
+            if (is_null($jabatan->parent_jabatan_id)) {
+                if ($jabatan->jenisJabatan->nama === 'MEDIS' && $kepalaBidangPelayananMedis) {
+                    $jabatan->update(['parent_jabatan_id' => $kepalaBidangPelayananMedis->id]);
+                } elseif ($jabatan->jenisJabatan->nama === 'PELAKSANA' && $kepalaSubbagianTataUsaha) {
+                    $jabatan->update(['parent_jabatan_id' => $kepalaSubbagianTataUsaha->id]);
+                } elseif ($direktur) {
+                    // Default to Direktur if no specific parent found
+                    $jabatan->update(['parent_jabatan_id' => $direktur->id]);
+                }
+            }
         }
     }
 }

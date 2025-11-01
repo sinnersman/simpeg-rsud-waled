@@ -16,8 +16,13 @@ class Cuti extends Model
         'end_date',
         'reason',
         'status',
-        'approver_id',
-        'approval_date',
+        'leave_type',
+        'approver_1_id',
+        'approval_1_date',
+        'approval_1_status',
+        'approver_2_id',
+        'approval_2_date',
+        'approval_2_status',
     ];
 
     public function pegawai()
@@ -25,8 +30,13 @@ class Cuti extends Model
         return $this->belongsTo(Pegawai::class);
     }
 
-    public function approver()
+    public function approver1()
     {
-        return $this->belongsTo(User::class, 'approver_id');
+        return $this->belongsTo(User::class, 'approver_1_id');
+    }
+
+    public function approver2()
+    {
+        return $this->belongsTo(User::class, 'approver_2_id');
     }
 }
